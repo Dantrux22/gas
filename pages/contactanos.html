@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto STIGAS</title>
+  <style>
+    :root {
+      --color-celeste: #23A0C0;
+      --color-rojo: #E63946;
+      --color-fondo: #F2F7FA;
+      --color-header: #D9EDF2;
+      --color-texto: #000000;
+      --color-blanco: #FFFFFF;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #header-placeholder {
+      width: 100%;
+      background-color: var(--color-header);
+      z-index: 1000;
+    }
+
+    .form-wrapper {
+      flex: 1;
+      width: 80vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      padding: 3rem 0;
+    }
+
+    .logo-stigas {
+      width: 120px;
+      height: auto;
+    }
+
+    .form-box {
+      background-color: var(--color-blanco);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      position: relative;
+    }
+
+    .form-box::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background-color: var(--color-celeste);
+      border-radius: 0 0 12px 12px;
+    }
+
+    .form-box input,
+    .form-box textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 1.2rem;
+      border: none;
+      border-bottom: 2px solid var(--color-celeste);
+      background: transparent;
+      font-size: 1rem;
+      color: var(--color-texto);
+      transition: border-color 0.3s;
+    }
+
+    .form-box textarea {
+      height: 150px;
+      resize: vertical;
+      overflow-y: auto;
+    }
+
+    .form-box input:focus,
+    .form-box textarea:focus {
+      border-color: var(--color-rojo);
+      outline: none;
+    }
+
+    .form-box input[type="submit"] {
+      background-color: var(--color-celeste);
+      color: var(--color-blanco);
+      border: none;
+      font-weight: bold;
+      padding: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .form-box input[type="submit"]:hover {
+      background-color: var(--color-rojo);
+    }
+
+    @media screen and (max-width: 768px) {
+      .form-wrapper {
+        width: 90vw;
+        padding: 2rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="form-wrapper">
+    <img src="/fotos/LOGO STIGAS CABA.png" alt="Logo STIGAS" class="logo-stigas" />
+    <form action="https://formsubmit.co/dantrux22@gmail.com" method="POST" class="form-box">
+      <input type="text" name="Nombre" placeholder="Nombre" required />
+      <input type="text" name="Apellido" placeholder="Apellido" required />
+      <input type="email" name="Gmail" placeholder="Correo electrónico" required />
+      <textarea name="mensaje" placeholder="Escriba su mensaje" required></textarea>
+      <input type="submit" value="Enviar" />
+      <input type="hidden" name="_captcha" value="false" />
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("/pages/header.html")
+        .then(response => response.text())
+        .then(data => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, 'text/html');
+          const headerContent = doc.body.firstChild;
+          document.getElementById("header-placeholder").appendChild(headerContent);
+
+          const scriptTags = doc.querySelectorAll("script");
+          scriptTags.forEach(script => {
+            const s = document.createElement("script");
+            if (script.src) {
+              s.src = script.src;
+              s.async = script.async;
+            } else {
+              s.textContent = script.textContent;
+            }
+            document.body.appendChild(s);
+          });
+        })
+        .catch(error => console.error("Error al cargar el header:", error));
+    });
+  </script>
+  <script src="/scrips/load-header.js"></script>
+
+</body>
+</html>

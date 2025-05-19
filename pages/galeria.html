@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galería Estilo Apple</title>
+  <style>
+    body {
+  margin: 0;
+  background-color: var(--color-fondo);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+}
+
+.gallery-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  justify-items: center;
+}
+
+.gallery img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
+
+.lightbox.show {
+  display: flex;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
+  </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+  <div class="gallery-container">
+    <div class="gallery">
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Imagen ampliada" />
+  </div>
+
+  <script>
+    function openLightbox(src) {
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      lightboxImg.src = src;
+      lightbox.classList.add("show");
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById("lightbox");
+      lightbox.classList.remove("show");
+    }
+  </script>
+  <script src="/scrips/load-header.js"></script>
+
+</body>
+</html>
