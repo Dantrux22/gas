@@ -2,30 +2,40 @@
 (function () {
   const PLACEHOLDER_ID = 'header-placeholder';
 
-  // Base = carpeta donde vive ESTE script
+  // Base = carpeta donde vive ESTE script (p.ej. /scripts/)
   const SCRIPT_URL = document.currentScript?.src || '';
   const BASE = new URL('.', SCRIPT_URL || location.href);
 
   // Rutas del parcial y del CSS, relativas al script
-  const PARTIAL_URL = new URL('../partials/header.html', BASE).href;
-  const CSS_URL     = new URL('../css/header.css', BASE).href;
+  const PARTIAL_URL = new URL('../partials/header.html', BASE).href; // -> /partials/header.html
+  const CSS_URL     = new URL('../css/header.css', BASE).href;       // -> /css/header.css
 
   async function injectHeader() {
+    // si ya hay un header, no hagas nada
+    if (document.querySelector('[data-header]')) {
+      ensureHeaderStylesheet();
+      wireUpHeaderInteractions();
+      markActiveLink();
+      return;
+    }
+
+    // buscar placeholder si existe
     const target = document.getElementById(PLACEHOLDER_ID);
-    if (!target) return;
 
     try {
       const res = await fetch(PARTIAL_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error(`No se pudo cargar ${PARTIAL_URL}`);
       const html = await res.text();
 
-      // Insertar header
-      target.outerHTML = html;
+      if (target) {
+        // Reemplaza placeholder por el header
+        target.outerHTML = html;
+      } else {
+        // Inserta el header como primer hijo del <body>
+        document.body.insertAdjacentHTML('afterbegin', html);
+      }
 
-      // Asegurar CSS del header
       ensureHeaderStylesheet();
-
-      // Interacciones
       wireUpHeaderInteractions();
       markActiveLink();
     } catch (e) {
