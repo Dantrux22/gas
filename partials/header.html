@@ -1,0 +1,64 @@
+<!-- /partials/header.html -->
+<header class="site-header" data-header>
+  <div class="container header-row">
+    <!-- Marca (logo + texto) -->
+    <a class="brand" href="/" aria-label="Inicio">
+      <img src="/fotos/LOGO STIGAS CABA.png" alt="Sindicato del Gas" style="height:28px;width:auto;border-radius:4px;" />
+      <span class="brand-text">GAS</span>
+    </a>
+
+    <!-- Toggle mobile -->
+    <button class="menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="main-nav">
+      <span class="sr-only">Abrir menú</span> ☰
+    </button>
+
+    <!-- Navegación centrada -->
+    <nav id="main-nav" class="main-nav" aria-label="Navegación principal">
+      <ul class="nav-list">
+        <!-- 1) PRIMER ITEM: mega-menú -->
+        <li class="nav-item has-mega" data-has-mega>
+          <button class="nav-link mega-toggle"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="mega-institucional"
+                  data-mega-toggle>
+            Institucional
+          </button>
+
+          <div id="mega-institucional" class="mega" role="menu">
+            <div class="mega-grid">
+              <section class="mega-col">
+                <h4 class="mega-title">Quiénes somos</h4>
+                <a role="menuitem" href="/pages/historia.html">Historia</a>
+                <a role="menuitem" href="/pages/autoridades.html">Autoridades</a>
+                <a role="menuitem" href="/pages/secretaria.html">Secretaría</a>
+              </section>
+
+              <section class="mega-col">
+                <h4 class="mega-title">Comunicación</h4>
+                <a role="menuitem" href="/pages/novedades.html">Novedades</a>
+                <a role="menuitem" href="/pages/galeria.html">Galería</a>
+                <a role="menuitem" href="/pages/contactanos.html">Contactanos</a>
+              </section>
+
+              <section class="mega-col">
+                <h4 class="mega-title">Sector</h4>
+                <a role="menuitem" href="/pages/industria.html">Industria</a>
+              </section>
+            </div>
+          </div>
+        </li>
+
+        <!-- 2) ITEM simple -->
+        <li class="nav-item">
+          <a href="/pages/industria.html" class="nav-link">Industria</a>
+        </li>
+
+        <!-- 3) ITEM simple -->
+        <li class="nav-item">
+          <a href="/pages/novedades.html" class="nav-link">Novedades</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

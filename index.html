@@ -1,117 +1,310 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1">
-    <link rel="icon" href="https://cdn.pixabay.com/photo/2020/10/24/07/38/logo-5680703_1280.png">
-    <link rel="stylesheet" href="./css/estilos.css">
-    <link rel="stylesheet" href="./css/responsive-index.css">
-    <title>El gas</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Sindicato del Gas: trámites, turnos, beneficios para afiliados, capacitaciones y novedades." />
+  <meta name="theme-color" content="#085e75" />
+  <link rel="icon" href="/fotos/LOGO STIGAS CABA.png" />
+  <!-- CSS del header (respaldo; el loader también lo inyecta) -->
+  <link rel="stylesheet" href="./css/header.css" />
+  <title>Sindicato del Gas — Inicio</title>
+
+  <!-- ===== Estilos DEL INDEX (inline) ===== -->
+  <style>
+    :root{
+      --brand:#085e75;
+      --brand-2:#0a6e89;
+      --ink:#0f2230;
+      --text:#102027;
+      --bg:#ffffff;
+      --container: min(1200px, 94vw);
+      --radius:16px;
+      --shadow: 0 16px 40px rgba(0,0,0,.18);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+    a{color:inherit}
+    img{display:block;max-width:100%}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;padding:0;margin:-1px}
+    .skip-link{position:absolute;left:-9999px;top:auto}
+    .skip-link:focus{left:12px;top:12px;background:#fff;padding:.5rem .75rem;border-radius:8px;box-shadow:var(--shadow);z-index:10000}
+
+    /* ===== HERO SLIDER (70vh) ===== */
+    .hero{
+      position:relative;
+      height:70vh; min-height:380px; width:100%;
+      background:#000; overflow:hidden; isolation:isolate;
+    }
+    .slides{ position:relative; inset:0; height:100%; }
+    .slide{
+      position:absolute; inset:0;
+      opacity:0; transform:scale(1.02);
+      transition:opacity .6s ease, transform .6s ease;
+      will-change:opacity, transform;
+    }
+    .slide.is-active{ opacity:1; transform:scale(1); }
+    .slide img{
+      width:100%; height:100%;
+      object-fit:cover; object-position:center;
+      filter:contrast(1.05) saturate(1.02);
+    }
+    /* overlay para legibilidad del texto */
+    .slide::before{
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.15) 45%, rgba(0,0,0,.0) 70%);
+      pointer-events:none;
+    }
+    /* Texto y CTA */
+    .caption{
+      position:absolute; inset:0; display:grid; align-content:center;
+      padding-inline: clamp(16px, 4vw, 40px);
+    }
+    .cap-inner{
+      width:var(--container); margin-inline:auto; max-width: 900px;
+      color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,.45);
+    }
+    .cap-eyebrow{
+      display:inline-block; margin:0 0 .5rem; padding:.25rem .6rem;
+      background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25);
+      border-radius:999px; font-weight:700; letter-spacing:.3px; font-size:.95rem;
+      backdrop-filter: blur(6px);
+    }
+    .cap-title{
+      margin:.2rem 0 .6rem; font-weight:800; line-height:1.1;
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+    }
+    .cap-sub{ margin:0 0 1.1rem; font-size: clamp(1rem, 2.1vw, 1.25rem); max-width: 60ch; }
+    .btn-cta{
+      display:inline-block; background:#ff8a3d; color:#fff; font-weight:800;
+      padding:.8rem 1.1rem; border-radius:.7rem; text-decoration:none; box-shadow:var(--shadow);
+    }
+    .btn-cta:hover{ filter:brightness(.95); }
+
+    /* Flechas */
+    .control{
+      position:absolute; top:50%; translate:0 -50%;
+      width:46px; height:46px; border-radius:50%;
+      display:grid; place-items:center;
+      background:rgba(255,255,255,.9);
+      border:0; cursor:pointer; box-shadow:var(--shadow);
+      font-size:24px; line-height:1;
+    }
+    .control:hover{ background:#fff; }
+    .control.prev{ left:14px; }
+    .control.next{ right:14px; }
+
+    /* Dots */
+    .dots{
+      position:absolute; left:50%; bottom:16px; translate:-50% 0;
+      display:flex; gap:8px; padding:6px 10px; border-radius:999px;
+      background:rgba(0,0,0,.35); backdrop-filter:blur(6px);
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:rgba(255,255,255,.6);
+      border:0; cursor:pointer;
+    }
+    .dot.is-active{ background:#fff; width:22px; border-radius:999px; transition:width .25s ease; }
+
+    /* ===== BARRA INFORMATIVA ===== */
+    .info-band{
+      width:100%; background:var(--brand); color:#fff;
+      margin:0; padding:12px 0; font-weight:700; letter-spacing:.2px;
+    }
+    .info-band .inner{
+      width:var(--container); margin-inline:auto; padding:0 6px;
+      display:flex; gap:12px; align-items:center; justify-content:center; text-align:center; flex-wrap:wrap;
+    }
+    .info-band a{ color:#fff; text-decoration:underline; }
+
+    /* Footer base (si lo mantenés) */
+    footer{ background:#0f2230; color:#cfe7ef; margin-top:40px; }
+    .footer-info{ width:var(--container); margin:0 auto; padding:26px 4px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+    .sub-footer-info input{
+      width:280px; max-width:100%; padding:.6rem .8rem; border-radius:8px; border:1px solid #a9c7d1; background:#fff;
+    }
+    .redes{ display:flex; gap:14px; align-items:center; }
+    .redes-a{ color:#fff; text-decoration:none; font-weight:600; }
+    .redes-a:hover{ text-decoration:underline; }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .control{ width:40px; height:40px; font-size:22px; }
+      .slide::before{ background:linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.2) 60%, rgba(0,0,0,.05) 85%); }
+    }
+  </style>
 </head>
+
 <body>
-<!-- NAV     -->
-<div id="header-placeholder"></div>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
 
-  <!-- INICIO   -->
+  <!-- Header reutilizable -->
+  <div id="header-placeholder"></div>
 
-<div class="Inicio">
-    <h1 class="titulo">Tu lugar para tomar café y acompañarlo con algo delicioso</h1>
-    <div class="inicio-buton">
-        <div class="buton-a b1"><a href="./pages/menu.html">Pedir hora</a></div>
-        <div class="buton-a"><a href="./pages/menu.html">Nuestro menú</a></div>
-    </div>
-</div>
+  <main id="main" role="main">
+    <!-- ===== SLIDER ===== -->
+    <section class="hero" aria-label="Campañas destacadas">
+      <div class="slides" data-slides>
+        <!-- 1 -->
+        <figure class="slide is-active">
+          <img src="https://images.unsplash.com/photo-1568968002134-8f4d1e717f2a?q=80&w=1920&auto=format&fit=crop" alt="Equipo en planta de gas" />
+          <figcaption class="caption">
+            <div class="cap-inner">
+              <span class="cap-eyebrow">Institucional</span>
+              <h2 class="cap-title">Un Sindicato del Gas más cerca de los trabajadores</h2>
+              <p class="cap-sub">Representación, diálogo y transparencia para defender tus derechos y mejorar tus condiciones laborales.</p>
+              <a class="btn-cta" href="/pages/historia.html">Conocé más</a>
+            </div>
+          </figcaption>
+        </figure>
 
-  <!-- OFERTA -->
-  <main class="oferta">
-    <p>Oferta del dia: Café + Tostado / $3.500</p>
+        <!-- 2 -->
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?q=80&w=1920&auto=format&fit=crop" alt="Inspector realizando control técnico" />
+          <figcaption class="caption">
+            <div class="cap-inner">
+              <span class="cap-eyebrow">Servicios</span>
+              <h2 class="cap-title">Trámites y turnos 100% online</h2>
+              <p class="cap-sub">Solicitá turnos para inspecciones, homologaciones y certificaciones de manera rápida y segura.</p>
+              <a class="btn-cta" href="/pages/contactanos.html">Sacá turno</a>
+            </div>
+          </figcaption>
+        </figure>
+
+        <!-- 3 -->
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=1920&auto=format&fit=crop" alt="Trabajadores con EPP en operación de válvulas" />
+          <figcaption class="caption">
+            <div class="cap-inner">
+              <span class="cap-eyebrow">Beneficios</span>
+              <h2 class="cap-title">Beneficios y asesoramiento para afiliados</h2>
+              <p class="cap-sub">Accedé a convenios, asesoría legal y programas de bienestar para vos y tu familia.</p>
+              <a class="btn-cta" href="/pages/novedades.html">Ver beneficios</a>
+            </div>
+          </figcaption>
+        </figure>
+
+        <!-- 4 -->
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop" alt="Capacitación en seguridad industrial" />
+          <figcaption class="caption">
+            <div class="cap-inner">
+              <span class="cap-eyebrow">Capacitaciones</span>
+              <h2 class="cap-title">Seguridad y formación continua</h2>
+              <p class="cap-sub">Cursos, jornadas y material técnico para elevar el estándar de seguridad en cada tarea.</p>
+              <a class="btn-cta" href="/pages/novedades.html">Próximas fechas</a>
+            </div>
+          </figcaption>
+        </figure>
+
+        <!-- 5 -->
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1920&auto=format&fit=crop" alt="Atención al público y delegaciones" />
+          <figcaption class="caption">
+            <div class="cap-inner">
+              <span class="cap-eyebrow">Contacto</span>
+              <h2 class="cap-title">Delegaciones y canales de atención</h2>
+              <p class="cap-sub">Encontrá tu delegación más cercana o escribinos para consultas y reclamos.</p>
+              <a class="btn-cta" href="/pages/contactanos.html">Ver contactos</a>
+            </div>
+          </figcaption>
+        </figure>
+      </div>
+
+      <button class="control prev" aria-label="Imagen anterior" data-prev>‹</button>
+      <button class="control next" aria-label="Imagen siguiente" data-next>›</button>
+      <div class="dots" role="tablist" aria-label="Selector de imagen" data-dots></div>
+    </section>
+
+    <!-- ===== BARRA INFORMATIVA ===== -->
+    <section class="info-band" aria-label="Información importante">
+      <div class="inner">
+        <span>📢</span>
+        <span>Paritarias 2025: acta acuerdo y escalas actualizadas disponibles.</span>
+        <a href="/pages/novedades.html">Ver documentación</a>
+      </div>
+    </section>
+
+    <!-- (Por ahora no agregamos más secciones; después sumamos módulos profesionales) -->
   </main>
 
-  <!-- Foto y descripcion -->
-  <div class="content">
-    
-    <div class="come"> 
-        <p class="descripcion-p"> <b>Comidas. </b> Enfocada en ingredientes frescos y saludables como el aceite de oliva, verduras, legumbres, pescado y mariscos. Abundan las ensaladas, pastas, arroces y guisos.</p>
-
-        <img class="descripcion-foto"  src="https://static.wixstatic.com/media/c837a6_b12138462b31409aaf8029cf7a2dd7ed~mv2.jpg/v1/fill/w_1722,h_1180,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/c837a6_b12138462b31409aaf8029cf7a2dd7ed~mv2.jpg" alt="comida">
-    </div>
-
-    <div class="bebe">
-        <img class="descripcion-foto bebe-responsive" src="https://static.wixstatic.com/media/c837a6_1c8f21588e024e4aa589012f541f7a3b~mv2.jpg/v1/fill/w_1714,h_1180,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/c837a6_1c8f21588e024e4aa589012f541f7a3b~mv2.jpg" alt="bebe">
-
-        <p class="descripcion-p"><b>Bebidas. </b>estimulante elaborada a partir de granos de café tostados y molidos, con diferentes métodos de preparación (espress, café filtrado, americano).</p>
-
-            <img class="descripcion-foto foto-compu" src="https://static.wixstatic.com/media/c837a6_1c8f21588e024e4aa589012f541f7a3b~mv2.jpg/v1/fill/w_1714,h_1180,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/c837a6_1c8f21588e024e4aa589012f541f7a3b~mv2.jpg" alt="bebe">
-
-    </div>
-
-        <div class="disfruta">
-        <p class="descripcion-p"><b>Disfruta. </b>Un ambiente cálido y acogedor: Un espacio perfecto para relajarte, trabajar o simplemente disfrutar de un buen café en compañía.</p>
-        <img class="descripcion-foto f3" src="https://static.wixstatic.com/media/c837a6_5d9b5804b420484aa112d37fa3ce3f45~mv2.jpg/v1/fill/w_1722,h_1180,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/c837a6_5d9b5804b420484aa112d37fa3ce3f45~mv2.jpg" alt="disfruta">
-    </div>
-  </div>
-
-    <!-- HORARIOS -->
-<div class="section-horarios-titulo-master" >
-    <h2 class="section-horarios-titulo">Pásate a comer algo.</h2>
-</div>    
-
-  <section>
-    
-   <div class="horarios-caracteristicas">
-
-    <div class="sub-horarios-caracteristicas">
-        <h3>Direccion</h3>
-        <p>calle falsa 123</p> 
-    </div>
-<div class="sub-r6"></div>
-
-    <div class="sub-horarios-caracteristicas">
-        <h3>Horario laboral</h3>
-        <p>Lun - Vie: 9:00 - 18:00 <br> Sábado: 10:00 - 14:00 <br> Domingo: cerrado</p>
-    </div>
-
-   </div>
-
-</section>
-
-<!-- GALERIA -->
-
-<div class="galeria">
-    <img class="galeria-img" src="https://static-cse.canva.com/blob/598703/Fotografiadecomida.jpg">
-    <img class="galeria-img" src="https://dosg.net/wp-content/uploads/2018/03/cafeteria.jpg">
-    <img class="galeria-img" src="https://img.freepik.com/fotos-premium/cafeteria-paredes-hormigon-muebles-madera_124865-22155.jpg">
-    <img class="galeria-img" src="https://img.freepik.com/foto-gratis/cafe-ai-generado_23-2150691657.jpg">
-    <img class="galeria-img" src="https://media.ambito.com/p/6df47dff34210c592ec44860dff072aa/adjuntos/239/imagenes/039/385/0039385718/1200x675/smart/medialunasjpeg.jpeg">
-    <img class="galeria-img" src="https://static-cse.canva.com/blob/598703/Fotografiadecomida.jpg">
-    <img class="galeria-img" src="https://dosg.net/wp-content/uploads/2018/03/cafeteria.jpg">
-    <img class="galeria-img" src="https://img.freepik.com/fotos-premium/cafeteria-paredes-hormigon-muebles-madera_124865-22155.jpg">
-    <img class="galeria-img" src="https://img.freepik.com/foto-gratis/cafe-ai-generado_23-2150691657.jpg">
-    <img class="galeria-img" src="https://media.ambito.com/p/6df47dff34210c592ec44860dff072aa/adjuntos/239/imagenes/039/385/0039385718/1200x675/smart/medialunasjpeg.jpeg">
-
-</div>
-
-      <!-- footer -->
-
-  <footer>
+  <!-- Footer mínimo (opcional) -->
+  <footer role="contentinfo">
     <div class="footer-info">
+      <div class="sub-footer-info">
+        <p>
+          (+54 11) 9999-9999 <br />
+          contacto@sindicatodelgas.org <br />
+          Av. Ejemplo 1234 — CABA
+        </p>
+        <label for="suscribite" class="sr-only">Suscribite a novedades</label>
+        <input id="suscribite" type="email" placeholder="Escribí tu mail" inputmode="email" />
+      </div>
 
-        <div class="sub-footer-info">
-            <p>+549-119999-9999 <br>
-                info@cafedelasmañanas.com <br>
-               Calle falsa 123
-            </p>
-            <label for="susbribite"><input type="text"  placeholder="escribe tu mail"></label>
-        </div>
-        
-        <div class="redes">
-            <a class="redes-a" href="https://www.instagram.com/dantenievas/">Instagram</a> 
-            <a class="redes-a" href="https://www.instagram.com/dantenievas/">Facebook</a>
-            <a class="redes-a" href="https://www.instagram.com/dantenievas/">Twitter</a>        
-        </div>
+      <div class="redes" aria-label="Redes sociales">
+        <a class="redes-a" href="#" target="_blank" rel="noopener">Instagram</a>
+        <a class="redes-a" href="#" target="_blank" rel="noopener">Facebook</a>
+        <a class="redes-a" href="#" target="_blank" rel="noopener">X</a>
+      </div>
     </div>
-
   </footer>
-<script src="./scripts/load-header.js"></script>
+
+  <!-- Carga del header -->
+  <script defer src="./scripts/load-header.js"></script>
+
+  <!-- ===== JS del slider ===== -->
+  <script>
+    (function(){
+      const $slides = Array.from(document.querySelectorAll('.slide'));
+      const $dotsWrap = document.querySelector('[data-dots]');
+      const $prev = document.querySelector('[data-prev]');
+      const $next = document.querySelector('[data-next]');
+      let i = 0, timer = null, AUTOPLAY_MS = 5500, isHover = false;
+
+      // Crear dots
+      $slides.forEach((_, idx) => {
+        const b = document.createElement('button');
+        b.className = 'dot' + (idx === 0 ? ' is-active' : '');
+        b.setAttribute('aria-label', 'Ir a imagen ' + (idx + 1));
+        b.addEventListener('click', () => go(idx, true));
+        $dotsWrap.appendChild(b);
+      });
+      const $dots = Array.from($dotsWrap.children);
+
+      function go(n, user=false){
+        $slides[i].classList.remove('is-active');
+        $dots[i].classList.remove('is-active');
+        i = (n + $slides.length) % $slides.length;
+        $slides[i].classList.add('is-active');
+        $dots[i].classList.add('is-active');
+        if (user) restart();
+      }
+      function next(){ go(i + 1); }
+      function prev(){ go(i - 1); }
+
+      function start(){ stop(); timer = setInterval(() => { if(!isHover) next(); }, AUTOPLAY_MS); }
+      function stop(){ if (timer) clearInterval(timer); }
+      function restart(){ start(); }
+
+      $next.addEventListener('click', () => next());
+      $prev.addEventListener('click', () => prev());
+
+      // Pausa al pasar mouse/touch
+      const hero = document.querySelector('.hero');
+      hero.addEventListener('mouseenter', () => { isHover = true; });
+      hero.addEventListener('mouseleave', () => { isHover = false; });
+      hero.addEventListener('touchstart', () => { isHover = true; }, {passive:true});
+      hero.addEventListener('touchend', () => { isHover = false; }, {passive:true});
+
+      // Teclado
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') next();
+        if (e.key === 'ArrowLeft') prev();
+      });
+
+      start();
+    })();
+  </script>
 </body>
 </html>
