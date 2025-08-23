@@ -1,120 +1,135 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Galería Estilo Apple</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Galería</title>
+  <link rel="stylesheet" href="../css/header.css">
   <style>
-    body {
-  margin: 0;
-  background-color: var(--color-fondo);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
-}
+    :root{ --container:min(1200px,94vw); --gap:16px; --bg:#0b0f12; --card:#12161c; }
+    body{ margin:0; background:var(--bg); color:#eef3f6; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    main{ width:var(--container); margin:24px auto; padding:0 4px; }
 
-.gallery-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 30px;
-}
+    .grid{
+      display:grid; gap:var(--gap);
+      grid-template-columns:repeat(3,1fr);
+    }
+    @media (max-width: 900px){ .grid{ grid-template-columns:repeat(2,1fr);} }
+    @media (max-width: 600px){ .grid{ grid-template-columns:1fr;} }
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  max-width: 1200px;
-  width: 100%;
-  justify-items: center;
-}
+    .card{ background:var(--card); border-radius:12px; overflow:hidden; }
+    .thumb{
+      display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit:cover;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .thumb:hover{ transform:scale(1.02); }
 
-.gallery img {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    .more-wrap{ display:flex; justify-content:center; margin:20px 0 8px; }
+    .btn-more{
+      background:#0e6f89; color:#fff; font-weight:800; border:0; cursor:pointer;
+      padding:.75rem 1rem; border-radius:10px;
+    }
 
-.gallery img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-.lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-}
-
-.lightbox img {
-  max-width: 90%;
-  max-height: 90%;
-  border-radius: 10px;
-}
-
-.lightbox.show {
-  display: flex;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .gallery {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .gallery {
-    grid-template-columns: 1fr;
-  }
-}
-
+    /* Lightbox */
+    .lightbox{
+      position:fixed; inset:0; display:none; place-items:center;
+      background:rgba(0,0,0,.9); z-index:10000; padding:20px;
+    }
+    .lightbox.show{ display:grid; }
+    .lightbox img{ max-width:95vw; max-height:90vh; border-radius:10px; }
+    .lightbox button{
+      position:absolute; top:16px; right:16px; background:#fff; border:0; border-radius:8px; padding:.4rem .6rem; cursor:pointer;
+    }
   </style>
 </head>
 <body>
+  <div id="header-placeholder"></div>
 
-  <div class="gallery-container">
-    <div class="gallery">
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
-      <img src="/fotos/comida.png" alt="Imagen 1" onclick="openLightbox(this.src)" />
+  <main>
+    <h1>Galería</h1>
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <div class="more-wrap"><button id="btnMore" class="btn-more">Cargar más</button></div>
+  </main>
 
-    </div>
-  </div>
-
-  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="Imagen ampliada" />
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+    <button id="closeLb" aria-label="Cerrar">✕</button>
+    <img id="lbImg" alt="" />
   </div>
 
   <script>
-    function openLightbox(src) {
-      const lightbox = document.getElementById("lightbox");
-      const lightboxImg = document.getElementById("lightbox-img");
-      lightboxImg.src = src;
-      lightbox.classList.add("show");
+    // Lista de imágenes (thumb vs full). Cambiá por tus nombres reales:
+    const IMAGES = [
+      {thumb:'/fotos/thumbs/1.webp', full:'/fotos/full/1.webp', alt:'Imagen 1'},
+      {thumb:'/fotos/thumbs/2.webp', full:'/fotos/full/2.webp', alt:'Imagen 2'},
+      {thumb:'/fotos/thumbs/3.webp', full:'/fotos/full/3.webp', alt:'Imagen 3'},
+      // ...agregá todas las que quieras
+    ];
+
+    const BATCH = 24;       // cuántas mostrar por tanda
+    let shown = 0;
+    const grid = document.getElementById('grid');
+    const btnMore = document.getElementById('btnMore');
+
+    function renderBatch(){
+      const slice = IMAGES.slice(shown, shown + BATCH);
+      slice.forEach(img => {
+        const card = document.createElement('a');
+        card.href = img.full;
+        card.className = 'card';
+        card.addEventListener('click', openLightbox(img), false);
+
+        // Usamos <img loading="lazy"> y width/height para evitar CLS
+        const el = document.createElement('img');
+        el.className = 'thumb';
+        el.loading = 'lazy';
+        el.decoding = 'async';
+        el.alt = img.alt || '';
+        el.width = 1200; el.height = 900; // relación 4:3 aprox (ajustá si querés)
+        el.src = img.thumb;
+
+        // srcset + sizes (opcional pero recomendado)
+        el.srcset = `${img.thumb} 600w, ${img.thumb} 900w`;
+        el.sizes = '(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw';
+
+        card.appendChild(el);
+        grid.appendChild(card);
+      });
+
+      shown += slice.length;
+      if (shown >= IMAGES.length) btnMore.style.display = 'none';
     }
 
-    function closeLightbox() {
-      const lightbox = document.getElementById("lightbox");
-      lightbox.classList.remove("show");
+    function openLightbox(img){
+      return function(e){
+        e.preventDefault();
+        const lb = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lbImg');
+        lbImg.src = ''; // reset
+        lb.classList.add('show');
+        // Cargamos la imagen grande recién ahora
+        lbImg.src = img.full;
+        lbImg.alt = img.alt || '';
+      }
     }
+
+    function closeLightbox(){
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lbImg');
+      lb.classList.remove('show');
+      lbImg.src = ''; // liberar memoria
+    }
+
+    btnMore.addEventListener('click', renderBatch);
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      if (e.target.id === 'lightbox' || e.target.id === 'closeLb') closeLightbox();
+    });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLightbox(); });
+
+    // Inicial
+    renderBatch();
   </script>
- <script src="/scripts/load-header.js"></script>
+
+  <script defer src="../scripts/load-header.js"></script>
 </body>
 </html>

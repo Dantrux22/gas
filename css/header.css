@@ -5,11 +5,17 @@
   --mega-bg: #0e6f89;
   --mega-shadow: 0 12px 28px rgba(0,0,0,.25);
   --container: min(1200px, 96vw);
+  --header-h: 66px;              /* alto aprox del header (desktop/tablet) */
+  --header-h-sm: 60px;           /* alto aprox del header (mobile) */
+  --backdrop: rgba(0,0,0,.35);   /* backdrop para el menú mobile */
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 a { text-decoration: none; }
+@media (prefers-reduced-motion:no-preference){
+  :root { scroll-behavior: smooth; }
+}
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -21,6 +27,7 @@ a { text-decoration: none; }
   position: sticky; top: 0; z-index: 1000;
   background: var(--header-bg);
   color: var(--text-on-header);
+  padding-top: env(safe-area-inset-top, 0); /* soporte notch */
 }
 
 .container{ width: var(--container); margin-inline: auto; }
@@ -30,7 +37,8 @@ a { text-decoration: none; }
   grid-template-columns: auto 1fr auto;  /* marca | nav centrada | (cta) */
   align-items: center;
   gap: .9rem;
-  padding: .75rem .5rem;                 /* un poco más de alto */
+  padding: .75rem .5rem;
+  min-height: var(--header-h);
 }
 
 /* Marca */
@@ -41,21 +49,32 @@ a { text-decoration: none; }
 .brand-icon{ font-size: 1.5rem; }
 .brand-text{ font-size: 1.22rem; }
 
-/* Si usás <img> para el logo dentro de .brand */
+/* Logo imagen */
 .brand img{
-  height: 36px;                          /* logo más grande */
+  height: 36px;
   width: auto; display: block;
   border-radius: 4px;
+  -webkit-user-drag: none; user-select: none;
 }
 
-.menu-toggle{
+@media (min-width: 900px){
+  .brand img{ height: 40px; }            /* un toque más grande en tablet/desk */
+  .brand-text{ font-size: 1.28rem; }
+}
+
+.menu-toggle {
   display: none;
-  background: transparent; border: 0; color: var(--text-on-header);
-  font-size: 1.35rem; cursor: pointer; padding: .35rem .5rem;
-  margin-left: .25rem;
+  background: transparent;
+  border: 0;
+  color: var(--text-on-header);
+  font-size: 1.6rem; /* un poco más grande para mejor usabilidad */
+  cursor: pointer;
+  padding: .35rem .6rem;
+  margin-left: auto;   /* 👈 empuja el botón al extremo derecho */
 }
 
-/* ===== NAV centrada ===== */
+
+/* ===== NAV centrada (desktop/tablet) ===== */
 .main-nav{ display: grid; justify-items: center; }
 .nav-list{
   list-style: none; display: flex; align-items: center; gap: .25rem;
@@ -64,13 +83,13 @@ a { text-decoration: none; }
 
 /* Enlaces del nav */
 .nav-link{
-  display: inline-block; padding: .65rem .9rem; border-radius: .5rem;
+  display: inline-block; padding: .65rem 1rem; border-radius: .5rem;
   color: var(--text-on-header); font-weight: 700; line-height: 1;
 }
 .nav-link:hover{ background: var(--header-bg-dark); }
 .nav-link.is-active{ background: var(--header-bg-dark); }
 
-/* ===== BOTÓN del mega que luce como link (adiós rectángulo blanco) ===== */
+/* ===== BOTÓN del mega que luce como link ===== */
 button.nav-link,
 .mega-toggle{
   -webkit-appearance: none;
@@ -79,10 +98,9 @@ button.nav-link,
   border: 0;
   color: var(--text-on-header);
   font: inherit;
-  padding: .65rem .9rem;                 /* igual que .nav-link */
+  padding: .65rem 1rem;                 /* igual que .nav-link */
   border-radius: .5rem;
-  cursor: pointer;
-  line-height: 1;
+  cursor: pointer; line-height: 1;
 }
 button.nav-link:hover,
 .mega-toggle:hover{ background: var(--header-bg-dark); }
@@ -94,7 +112,7 @@ button.nav-link:focus-visible,
   border-radius: .5rem;
 }
 
-/* ===== Mega menú ===== */
+/* ===== Mega menú (desktop/tablet) ===== */
 .has-mega{ position: relative; }
 .has-mega .mega{
   position: absolute; left: 50%; transform: translateX(-50%);
@@ -103,7 +121,7 @@ button.nav-link:focus-visible,
   background: var(--mega-bg); color: #fff; border-radius: .5rem;
   box-shadow: var(--mega-shadow);
   padding: 1.25rem 1rem;
-  z-index: 1100;                          /* sobre slider u otros */
+  z-index: 1100;
 }
 .has-mega:hover .mega,
 .has-mega.open .mega{ display: block; }
@@ -127,32 +145,97 @@ button.nav-link:focus-visible,
 .header-cta .btn.btn-cta:hover,
 .nav-cta-mobile .btn.btn-cta:hover{ filter: brightness(.95); }
 
-/* ===== Mobile ===== */
+/* =========================================================
+   =====================   MOBILE   ========================
+   ========================================================= */
 .nav-cta-mobile{ display: none; }
 
 @media (max-width: 900px){
-  .header-row{ grid-template-columns: auto 1fr auto; }
-  .menu-toggle{ display: inline-block; }
-  .main-nav{ display: none; }
-  .site-header.nav-open .main-nav{ display: block; }
+  .header-row{
+    grid-template-columns: auto 1fr auto;
+    min-height: var(--header-h-sm);
+    padding-inline: max(.5rem, env(safe-area-inset-left, 0));
+  }
 
+  .menu-toggle {
+    display: inline-block;
+    justify-self: end; /* 👈 asegura que esté a la derecha */
+  }
+
+  /* Drawer: el nav pasa a fijo bajo el header con backdrop */
+  .main-nav{
+    display: block;
+    position: fixed;
+    left: 0; right: 0;
+    top: calc(env(safe-area-inset-top, 0) + var(--header-h-sm));
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .25s ease, opacity .25s ease;
+    z-index: 1050;
+  }
+
+  /* fondo semitransparente detrás del menú */
+  .site-header::after{
+    content:""; position: fixed; inset: 0;
+    background: var(--backdrop);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+    z-index: 1040;
+  }
+
+  .site-header.nav-open .main-nav{
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .site-header.nav-open::after{
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Contenido del menú */
   .nav-list{
     flex-direction: column; align-items: stretch; gap: .25rem;
-    padding: .5rem 0;
+    padding: .5rem;
+    margin: 0 auto;
+    width: min(680px, 92vw);
+    background: var(--mega-bg);
+    border-radius: 12px;
+    box-shadow: var(--mega-shadow);
   }
+
+  /* Tap targets más grandes */
   .nav-link,
   button.nav-link,
-  .mega-toggle{ padding: .85rem 1rem; }
+  .mega-toggle{ padding: 1rem 1rem; font-size: 1.05rem; }
 
+  /* Mega contenido dentro del flujo (acordeón) */
   .has-mega .mega{
     position: static; transform: none; width: 100%;
-    display: none; margin: .25rem 0 0; border-radius: .5rem;
+    display: none; margin: .25rem 0 0; border-radius: .6rem;
+    padding: .85rem .75rem;
+    background: #0c6f88; /* un pelín más claro para separar */
   }
   .has-mega.open .mega{ display: block; }
 
-  .mega-grid{ grid-template-columns: 1fr; }
+  .mega-grid{ grid-template-columns: 1fr; gap: .75rem; }
+  .mega-title{ font-size: 1rem; margin-bottom: .4rem; }
 
   /* Si existiera CTA derecha, ocultarla en mobile y mostrar dentro del menú */
   .header-cta{ display: none; }
   .nav-cta-mobile{ display: block; padding: .25rem 1rem; }
+}
+
+/* Ajustes finos en móviles chicos */
+@media (max-width: 700px){
+  .brand img{ height: 34px; }
+  .brand-text{ font-size: 1.18rem; }
+  .menu-toggle{ font-size: 1.45rem; }
+}
+
+@media (max-width: 480px){
+  .nav-link,
+  button.nav-link,
+  .mega-toggle{ padding: .95rem .9rem; font-size: 1.02rem; }
 }
