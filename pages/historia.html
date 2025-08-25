@@ -4,82 +4,133 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Historia</title>
-    <style>
-    body {
-      background-color: var(--color-fondo);
+
+  <!-- Tokens globales -->
+  <script src="/scripts/theme.js"></script>
+
+  <style>
+    /* --- reset mínimo global para evitar bandas blancas --- */
+    html, body {
       margin: 0;
-      padding: 0;
+      background: var(--color-fondo);
+      color: var(--color-texto);
     }
-    .timeline {
-      width: 90%;
-      max-width: 900px;
+
+    /* ---------- Estilos SOLO para Historia (scoped) ---------- */
+    .historia {
+      min-height: 100dvh;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Arial, sans-serif;
+    }
+
+    .historia .timeline {
+      width: var(--ancho-contenedor, min(1200px, 94vw));
       margin: 3rem auto;
       padding: 0;
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.25rem;
     }
 
-    .timeline-item {
-      background-color: var(--color-Blanco);
-      border-left: 5px solid var(--color-rojo);
-      padding: 1rem 2rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Línea decorativa izquierda */
+    .historia .timeline::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--color-marca), var(--color-marca-2));
+      border-radius: 2px;
+      opacity: .5;
+    }
+
+    .historia .timeline-item {
+      background: var(--color-detalle);
+      border: 1px solid var(--color-borde);
+      border-left: 6px solid var(--color-marca);
+      border-radius: var(--radius, 14px);
+      padding: 1rem 1.25rem 1.25rem 1.25rem;
+      box-shadow: var(--color-sombra);
       position: relative;
-      overflow: hidden;
+      overflow: hidden; /* se desactiva al expandir */
     }
 
-    .timeline-item::before {
+    .historia .timeline-item.expanded {
+      overflow: visible;
+    }
+
+    .historia .timeline-item::before {
       content: '';
       position: absolute;
       top: 1rem;
       left: -10px;
       width: 20px;
       height: 20px;
-      background-color:var(--color-rojo);
+      background: var(--color-marca);
+      border: 2px solid var(--color-detalle);
+      box-shadow: 0 0 0 3px rgba(0,0,0,.2);
       border-radius: 50%;
     }
 
-    .timeline-date {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+    .historia .timeline-date {
+      font-weight: 800;
+      margin: 0 0 .35rem 0;
+      line-height: 1.25;
+      color: var(--color-texto);
     }
 
-    .timeline-content {
-      max-height: 4.5em;
+    /* Contenido colapsable (altura inicial ~3 líneas) */
+    .historia .timeline-content {
+      color: var(--color-texto);
+      opacity: .95;
+      max-height: 4.8em;
       overflow: hidden;
-      transition: max-height 2s ease-in-out;
+      transition: max-height 0.6s ease;
     }
 
-    .timeline-item.expanded .timeline-content {
-      max-height: 1000em;
-      transition: max-height 2s ease-in;
-    }
-
-    .timeline-item:not(.expanded) .timeline-content {
-      transition: max-height 0.2s ease-out;
-    }
-
-    .show-more {
-      display: block;
-      margin-top: 0.5rem;
-      color: var(--color-texto2);
+    .historia .show-more {
+      display: inline-block;
+      margin-top: .6rem;
+      color: var(--color-enlace);
       cursor: pointer;
-      font-weight: bold;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: .95rem;
+      text-decoration: none;
     }
+    .historia .show-more:hover {
+      color: var(--color-enlace-hover);
+      text-decoration: underline;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .historia .timeline-content { transition: none !important; }
+    }
+
+    @media (max-width: 768px) {
+      .historia .timeline { margin: 2rem auto; gap: 1rem; }
+      .historia .timeline-item { padding: .9rem 1rem 1.1rem; }
+      .historia .timeline::before { left: 16px; }
+      .historia .timeline-item::before { left: -8px; }
+    }
+    /* ---------- FIN estilos scoped ---------- */
   </style>
 </head>
 <body>
-
+  <!-- Header reutilizable -->
   <div id="header-placeholder"></div>
 
+  <!-- Contenido de Historia (scoped) -->
+  <main class="historia">
+    <section class="timeline">
 
-  <section class="timeline">
-    <div class="timeline-item">
-      <div class="timeline-date">ALBORES DE  LA ORGANIZACIÓN SINDICAL
-        DE LOS TRABAJADORES DE LA INDUSTRIA DEL GAS</div>
-      <div class="timeline-content">A mediados de la década del 40 del siglo pasado, la organización sindical que contenía  a los trabajadores del gas era ATE (Asociación de Trabajadores del Estado) con su secretario general Libertario Ferrari, hombre que había iniciado su actividad laboral en la vieja Compañía Primitiva de Gas de Buenos Aires en “épocas de los ingleses” como solían denominarla.  
+      <div class="timeline-item">
+        <div class="timeline-date">ALBORES DE LA ORGANIZACIÓN SINDICAL DE LOS TRABAJADORES DE LA INDUSTRIA DEL GAS</div>
+        <div class="timeline-content">
+          <!-- pega aquí el contenido largo completo de este ítem -->
+         A mediados de la década del 40 del siglo pasado, la organización sindical que contenía  a los trabajadores del gas era ATE (Asociación de Trabajadores del Estado) con su secretario general Libertario Ferrari, hombre que había iniciado su actividad laboral en la vieja Compañía Primitiva de Gas de Buenos Aires en “épocas de los ingleses” como solían denominarla.  
         Libertario Ferrari nació en la ciudad de Buenos Aires en 1912 en el seno de una familia italiana de ideales anarquistas. Con apenas 13 años ingresó en la “Compañía Primitiva de Gas”. Su infancia se caracterizó, como tantos otros, por las privaciones a las que se  vieron sometidos los trabajadores de aquellos años. Sin embargo, no fueron excusas para enfrentar una vida de luchas. Desde muy joven se vio atraído por los ideales de FORJA, (Fuerza de Organización Radical de la Joven Argentina) cuyos integrantes seguidores de Hipólito Yrigoyen, se dedicaban a la publicación de revistas y folletos que denunciaban el estado de entrega del país a los intereses extranjeros y como estaba prohibida la actividad política, realizaban sus reuniones clandestinas en sótanos.  De  a  poco fueron ganando la calle en los años que se conocieron después como la década infame. Entre otros estaba integrado por Arturo Jauretche, Raúl Scalabrini Ortiz y Homero Manzi.
         Ferrari, comienza su actividad gremial como delegado de sus compañeros del gas en ATE precisamente. Recién en 1944 acuerdan una visita al coronel Perón y  a partir de ahí comprenden el cambio que les propone el líder en ciernes.
         Los días decisivos al 17 de octubre de 1945, lo encuentran como figura importante de ATE, por lo cual es designado para representar al gremio, junto con otros tres compañeros, en la reunión del Comité Central Confederal. Ésta se realiza el 16 de octubre de 1945 teniendo como eje principal ratificar o rechazar el paro general que ya ha dispuesto la Comisión Directiva de la CGT, con motivo de la renuncia y detención de Perón.En la mencionada reunión sindical del 16 de octubre, los ferroviarios, la delegación más numerosa, se inclinan por una posición moderada, oponiéndose a toda medida de fuerza. La intervención de Libertario Ferrari adquiere entonces enorme importancia pues la solidez de sus argumentos, y su mayor formación política, influyen decididamente sobre la asamblea obrera. Allí sostiene: 
@@ -111,13 +162,14 @@
         Testimonio de Cacho Constanzo, ex dirigente
         Como herramienta de acción sindical la personería gremial al nuevo sindicato sólo le permitía firmar las cuestiones de Capital Federal, donde además la empresa tenía las oficinas centrales, pero no podía hacerlo por los obreros y empleados del resto del país donde si tenía amplia jurisdicción la empresa estatal. Fue ahí que en 1958 se crea la Federación Argentina del Personal de Gas del Estado con personería gremial 587. La primera acción política que encara la primera comisión directiva tanto de los sindicatos como de la federación es afiliarse a la CGT. La Federación la integran además de Capital Federal, los  sindicatos de  Bahía Blanca, Comodoro Rivadavia por zona sur, Córdoba, La Plata, Mar del Plata, Mendoza por zona Cuyo, Neuquén- Río Negro, Rosario, Salta- Jujuy, San Nicolás, Santa Fé, Santiago del Estero, Tucumán y las filiales de  Campana y Zárate.
         Desde 1957 y por la profusa e incansable lucha de las organizaciones sindicales el gobierno de facto profundizó la represión después de observar que en las elecciones en los sindicatos nuevas conducciones de filiación peronista volvían a ganar. La CGT durante este período permaneció intervenida. El movimiento obrero se dividió entre la 62 Organizaciones en su mayoría peronistas y los 32 gremios democráticos de tendencia antiperonista. La dictadura convoca a elecciones generales y en 1958 Arturo Frondizi accede a la presidencia de la nación después de contar con el caudal de votos que poseía el peronismo. Un pacto firmado entre el representante de Frondizi, Rogelio Frigerio y Juan Perón tuvo alcances diversos entre ellos la ley sindical 14.455 que establecía pro y contras como libre agremiación, pero atribuyendo la personería gremial al de mayor representatividad, además de garantizar los puestos de trabajo a los representantes gremiales. Bajo esas circunstancias históricas se posibilita la creación de nuevas organizaciones sindicales, entre ellas, las que representaban a los trabajadores de Gas del Estado. Cómo ya hemos dicho primero se crea el sindicato de Capital Federal y luego la Federación bajo el amparo de la nueva norma de organizaciones profesionales.
-                     
         </div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">1928 Nacionalización del Gas</div>
-      <div class="timeline-content">En 1928, en el marco de las políticas de estado del gobierno de Yrigoyen, tuvo una oportunidad laboral en YPF,   un ingeniero de 27 años como jefe de turno en la Destilería La Plata. Julio Vicente Canessa era un joven radical estudioso del abastecimiento energético para el desarrollo nacional. Transitó la Década Infame desde la empresa nacional YPF sin dejar de pensar,  un solo momento, que un día le llegaría a él y a la patria el turno de poner en marcha un plan  estratégico de extracción de gas natural, que por entonces se venteaba a la atmósfera.  
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">1928 Nacionalización del Gas</div>
+        <div class="timeline-content">
+         En 1928, en el marco de las políticas de estado del gobierno de Yrigoyen, tuvo una oportunidad laboral en YPF,   un ingeniero de 27 años como jefe de turno en la Destilería La Plata. Julio Vicente Canessa era un joven radical estudioso del abastecimiento energético para el desarrollo nacional. Transitó la Década Infame desde la empresa nacional YPF sin dejar de pensar,  un solo momento, que un día le llegaría a él y a la patria el turno de poner en marcha un plan  estratégico de extracción de gas natural, que por entonces se venteaba a la atmósfera.  
         El venteo consistía en el  desaprovechamiento del gas surgente de un pozo de producción de petróleo, que se quemaba por motivos de seguridad. Ese era un desperdicio energético que le llamó la atención y es así como en 1943 viaja a Comodoro Rivadavia y desde ahí diseña un plan, en principio de captación del gas para uso en la zona. Con los resultados obtenidos diseña la construcción de un gran gasoducto que llegue a las puertas de Buenos Aires. 
         En 1944, Julio Canessa elabora  deja testimonio escrito de lo experimentado y vivido en el sur patagónico bajo el título: Los Servicios Públicos del Gas en la Argentina. Necesidad de su nacionalización, extensión y centralización 
         “Hay ciertos servicios en la vida de las poblaciones de un país que por su necesidad y generalidad asumen el carácter de servicio público. Su prestación es realizada por la administración pública, directamente o por medio de concesionarios. En sus orígenes, la mayor parte de los servicios públicos han sido prestados por medio de concesionarios; empero, la tendencia universal que prevalece hoy día es que dichos servicios sean prestados directamente por el Estado (Nación, Provincia o ·Municipalidad). El grado de urgencia en poner dichos servicios en manos del Estado varía con la naturaleza del servicio y la concurrencia de ciertos factores locales propios de cada país.   Desde el punto de vista de la naturaleza del servicio, existen algunos de ellos que revisten el carácter de esenciales, tales entre otros: aguas corrientes, gas y electricidad. Por la importancia que dichos servicios tienen para el individuo y la Nación y por la necesidad de que tan vital e imprescindibles actividades sean prestadas sin lucro y atendiendo a un interés social y nacional, por sobre cualquier interés privado. Se discute hoy día la necesidad urgente de que los servicios esenciales sean prestados directamente por el Estado, pasando a sus manos aquellos que aun se encuentran en manos de concesionarios. En aquellos países en que para la prestación de algunos de los mencionados servicios, actualmente atendidos por concesionarios, no se recurre a capitales, materia prima ni elementos extranjeros, parecería que existiese una suficiente garantía de protección del interés nacional y que fuese relativo el grado de urgencia en pasar dichos servicios a mano del Estado, por cuanto siendo los capitales nacionales, como así también la materia prima y los elementos, no habría, con tal forma de prestación, perjuicio para la economía nacional; siendo los únicos riesgos que el servicio no se prestase a tarifas razonables, ni con la generalidad y extensión requeridas por la población: es decir, que no se prestase atendiendo al interés social. Esos riesgos no deberían existir, por cuanto el Estado con su poder de policía puede imponer tarifas razonables y exigir la generalidad y extensión del servicio. Por ello resulta así en países de economía soberanas o  sólo en teoría, pues en la práctica, en nuestro país, los servicios públicos atendidos por concesionarios, lo son por grandes organismos financieros (Holding) a veces tan poderosos que enfrentan de por sí el Estado, directamente o por intermedio de grupos colaterales. Cuando tal proceder no es posible o suficiente recurren con harta frecuencia al doblegamiento de autoridades y funcionarios, destruyendo o avasallando todo poder de contralor por medio de influencias políticas u otros procedimientos, con lo cual resulta en definitiva el poder de policía del Estado una mera ficción”
@@ -137,11 +189,13 @@
          La ingeniería y el diseño de la construcción en todos sus tramos fue dirigida por el propio Canessa. Tras su desembarco en los puertos de  Ensenada, Mar del Plata y Bahía Blanca,  las cañerías fueron cargadas  en camiones  y llevadas hasta el campo donde las excavadoras, que funcionaban día y noche, hora tras horas, acortaban las distancias entre la pampa bonaerense  y el sur patagónico. Se atravesaron ríos, se dinamitaron suelos pedregosos, se atravesaron pantanos, se cruzaron montañas.  Se utilizaron 63 millones de kilos de caños de acero de 10 y de 8 pulgadas, se revistieron caños con 175 mil litros de pintura asfáltica, 8 millones de kilos de asfalto, 2 millones de metros cuadrados de lana de vidrio y 2 millones de metros cuadrados de papel impregnados en asfalto. Todo esto se realizó con más de 5 mil hombres  y mujeres argentinos en apenas 1041 días de trabajo sin que la obra se viera detenida por un solo día. En camiones del estado argentino se  trasladaron, además de los caños;  equipos de soldaduras, carpas, cocineros, cines móviles para esparcimiento del personal, material rodante, médicos y enfermeras y equipos sanitarios. Se dispuso de técnicos geólogos, aviones y helicópteros para avistajes y fotografías aéreas. Tractores, desmalesadoras, hasta una brigada especial de perros adiestrados en detectar escapes de gas. Con un estricto control se avanzó a razón unos 37 km al mes. Si estos promedios eran superados, el personal cobraba un extra en su jornal, cosa que se repitió más de una vez. Los obreros de la nueva Argentina y del gasoducto dormían en los pueblos más cercanos. Trabajaban cuarenta horas a la semana. Cada dos meses se les daba ocho días de descanso con viáticos pagos. Preparados por médicos nutricionistas se elaboraban menús especiales para hacer frente a las condiciones del clima. Carnes, locros, frutas y pastas con la única condición que la bebida alcohólica fuera suministrada sólo los días de descanso.  El director adjunto fue el ingeniero Carlos Lucero Flores; el director técnico, Ingeniero Pedro Rodríguez, el sub director administrativo, ingeniero Esteban Pérez, el segundo sub director de obra administrativo el Sr. Alberto Carrizo y el Sr. Arturo Cornella. Cuando se terminó el gasoducto se realizó un desfile por las calles de  Buenos Aires con todos los equipos utilizados donde miles de personas vieron pasar a los obreros, técnicos e ingenieros que habían realizado la hazaña.  
         Meses después de terminado el gran gasoducto el ingeniero Canessa vuelve a solicitar una entrevista con Perón y esta vez se realiza en la Casa Rosada. Acompañado por su plana mayor, el ingeniero Canessa le lleva al presidente decenas de carpetas con todos los gastos pormenorizados del costo de tamaña empresa. Al terminar y ante la sorpresa del propio Perón, el director del proyecto le comunica que del presupuesto asignado había sobrado un dinero que estaba depositado en el Banco de la Nación.  Perón lo miró y le preguntó. “¿Y qué piensa hacer con eso dinero, Canessa?” “No es mío general, es del pueblo argentino” respondió Canessa. “Pues bien, repártalo entre todos los trabajadores que lo hicieron posible” concluyó el presidente Perón.
         </div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">1958 NUESTROS  PRIMEROS CONVENIOS COLECTIVOS</div>
-      <div class="timeline-content">Entre 1958 y 1965 la Federación de Empleados de Gas del Estado acuerda los primeros convenios colectivos con escalas salariales y nuevas condiciones laborales. La empresa Gas del Estado deja de ser la de los pioneros fundadores para convertirse en una donde los trabajadores reclaman condiciones y mejoras salariales como cualquier otra en relación de dependencia.  Al frente del sindicato se encuentra la Lista Blanca compuesta en su inmensa mayoría por los socios fundadores de la organización, todos de extracción peronista, sin militancia política de relevancia. Como ejemplo detallamos el convenio colectivo de trabajo (CCT) de 1965 con los siguientes paritarios sindicales: Waldino Salinas, Roberto Arancibia, Héctor Márquez,  Ernesto Santapaola, Alberto Agüero, José Figari y Salvador Manganaro. En la segunda mitad de la década del 60 el sindicato de Capital Federal estaba conducido por Salvador Manganaro, ahora como Lista Marrón que se había impuesto en las elecciones de 1966. La postura de la Lista Marrón en la conducción del sindicato estaba orientada a la pertenencia política a las 62 Organizaciones Peronistas con un marcado acento en la cuestión social y societaria. En tiempos de la dictadura del general Onganía la comisión directiva puso el acento en la masiva afiliación de los trabajadores y trabajadoras de Gas del Estado.
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">1958 NUESTROS PRIMEROS CONVENIOS COLECTIVOS</div>
+        <div class="timeline-content">
+          Entre 1958 y 1965 la Federación de Empleados de Gas del Estado acuerda los primeros convenios colectivos con escalas salariales y nuevas condiciones laborales. La empresa Gas del Estado deja de ser la de los pioneros fundadores para convertirse en una donde los trabajadores reclaman condiciones y mejoras salariales como cualquier otra en relación de dependencia.  Al frente del sindicato se encuentra la Lista Blanca compuesta en su inmensa mayoría por los socios fundadores de la organización, todos de extracción peronista, sin militancia política de relevancia. Como ejemplo detallamos el convenio colectivo de trabajo (CCT) de 1965 con los siguientes paritarios sindicales: Waldino Salinas, Roberto Arancibia, Héctor Márquez,  Ernesto Santapaola, Alberto Agüero, José Figari y Salvador Manganaro. En la segunda mitad de la década del 60 el sindicato de Capital Federal estaba conducido por Salvador Manganaro, ahora como Lista Marrón que se había impuesto en las elecciones de 1966. La postura de la Lista Marrón en la conducción del sindicato estaba orientada a la pertenencia política a las 62 Organizaciones Peronistas con un marcado acento en la cuestión social y societaria. En tiempos de la dictadura del general Onganía la comisión directiva puso el acento en la masiva afiliación de los trabajadores y trabajadoras de Gas del Estado.
         “Mi padre, que todos conocían como el Flaco Bassi,  estuvo muy        cercano en aquellos días al sindicato. Era amigo de Martelli, un hombre que pertenecía a lo que se conoció como la ortodoxia peronista, muy cercano a Vandor. Recuerdo, que yo era chico, cuando adquirimos el centro recreativo de San Justo. Se lo compraron al actor Luis Sandrini”
 Rubén Bassi ex dirigente
 
@@ -165,59 +219,124 @@ En el acto de asunción hablaron en primer lugar Ítalo Martelli de la saliente 
 Cierra el encuentro el nuevo Secretario General  Victor González
 “La Lista Naranja surgió del Frente Usina Corrales, formado por 300 compañeros y compañeras, activistas gremiales, al que le dieron apoyo la Agrupación Punzó, la Agrupación Libertario Ferrari, Agrupación Peronista de Base de la CGT de los Argentinos, y la J.P. de Gas del Estado. Este gremio es nuestro, compañeros y es nuestra obligación mejorarlo. Pensamos lograr un modelo ideal de sindicato. Es difícil conseguirlo, pero no imposible. Exhortamos a toda la masa afiliada a no claudicar en la lucha. Es esta nuestra misión en esta hora difícil de la Patria. No luchamos por nosotros, luchamos por nuestros hogares, por el porvenir de nuestros hijos, por la educación y la cultura integral al servicio del pueblo, con plena ocupación, por la defensa de nuestra soberanía”
 Los nuevos dirigentes fueron ovacionados por cientos de compañeros que asistieron al acto y con la amenazante presencia de la brigada de la Policía Federal en la puerta del sindicato.  En el cierre cantaron el Himno Nacional y luego la Marcha Peronista. El cambio de rumbo se ve en las primeras acciones al adherirse el sindicato nuevamente a la CGT de  los Argentinos por su estrecha vinculación con Raimundo Ongaro su Sec. Gral.
-</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">2016</div>
-      <div class="timeline-content">Lorem ipsum 2016 - Acuerdo de París y Programa RenovAr.</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">2017</div>
-      <div class="timeline-content">Lorem ipsum 2017 - Ley de generación distribuida.</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">2018</div>
-      <div class="timeline-content">Lorem ipsum 2018 - Lanzamiento del Plan Nacional de Industria y Cambio Climático.</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">2019</div>
-      <div class="timeline-content">Lorem ipsum 2019 - Estrategias para la mitigación del cambio climático.</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">2021</div>
-      <div class="timeline-content">Lorem ipsum 2021 - Nueva ley con objetivos actualizados de la matriz energética.</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-date">2023</div>
-      <div class="timeline-content">Lorem ipsum 2023 - Plan Nacional de Adaptación y Mitigación. Argentina productiva 2030.</div>
-      <span class="show-more" onclick="toggleExpand(this)">Ver más</span>
-    </div>
-  </section>
- <section class="timeline">
-    <!-- Timeline items aquí -->
-  </section>
+        </div>
+        <span class="show-more">Ver más</span>
+      </div>
 
-  <script src="/scrips/load-header.js"></script>
+      <div class="timeline-item">
+        <div class="timeline-date">2016</div>
+        <div class="timeline-content">Lorem ipsum 2016 - Acuerdo de París y Programa RenovAr.</div>
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2017</div>
+        <div class="timeline-content">Lorem ipsum 2017 - Ley de generación distribuida.</div>
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2018</div>
+        <div class="timeline-content">Lorem ipsum 2018 - Plan Nacional de Industria y Cambio Climático.</div>
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2019</div>
+        <div class="timeline-content">Lorem ipsum 2019 - Estrategias para la mitigación del cambio climático.</div>
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2021</div>
+        <div class="timeline-content">Lorem ipsum 2021 - Nueva ley con objetivos actualizados de la matriz energética.</div>
+        <span class="show-more">Ver más</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2023</div>
+        <div class="timeline-content">Lorem ipsum 2023 - Plan Nacional de Adaptación y Mitigación. Argentina productiva 2030.</div>
+        <span class="show-more">Ver más</span>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Carga del header -->
+  <script src="/scripts/load-header.js"></script>
+
+  <!-- Interacción “Ver más / Ver menos” (abre TODO, autocierra otros) -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll('.show-more').forEach(button => {
-        button.addEventListener('click', () => {
-          const item = button.closest('.timeline-item');
-          item.classList.toggle('expanded');
-          button.textContent = item.classList.contains('expanded') ? 'Ver menos' : 'Ver más';
+      const COLLAPSED = '4.8em';
+      const items = Array.from(document.querySelectorAll('.historia .timeline-item'));
+
+      function expand(item) {
+        const content = item.querySelector('.timeline-content');
+        const btn = item.querySelector('.show-more');
+        if (!content || !btn) return;
+
+        // Cerrar otros
+        items.forEach(other => { if (other !== item && other.classList.contains('expanded')) collapse(other); });
+
+        item.classList.add('expanded');
+
+        // 1) animar hasta la altura real
+        content.style.maxHeight = content.scrollHeight + 'px';
+
+        // 2) al terminar la transición, quitar el límite (para TODO el texto)
+        const onEnd = (e) => {
+          if (e.propertyName !== 'max-height') return;
+          content.style.maxHeight = 'none';
+          content.removeEventListener('transitionend', onEnd);
+        };
+        content.addEventListener('transitionend', onEnd);
+
+        btn.textContent = 'Ver menos';
+
+        // Si hay imágenes/medios que cambien la altura, recalcular
+        content.querySelectorAll('img, video').forEach(el => {
+          el.addEventListener('load', () => {
+            if (getComputedStyle(content).maxHeight !== 'none') {
+              content.style.maxHeight = content.scrollHeight + 'px';
+            }
+          }, { once: true, passive: true });
+        });
+      }
+
+      function collapse(item) {
+        const content = item.querySelector('.timeline-content');
+        const btn = item.querySelector('.show-more');
+        if (!content || !btn) return;
+
+        // Si estaba sin límite, fijar a su altura actual para poder animar
+        if (getComputedStyle(content).maxHeight === 'none') {
+          content.style.maxHeight = content.scrollHeight + 'px';
+        }
+
+        item.classList.remove('expanded');
+
+        // Siguiente frame: llevar a la altura colapsada (suave)
+        requestAnimationFrame(() => {
+          content.style.maxHeight = COLLAPSED;
+        });
+
+        btn.textContent = 'Ver más';
+      }
+
+      // Estado inicial y listeners
+      items.forEach(item => {
+        const content = item.querySelector('.timeline-content');
+        const btn = item.querySelector('.show-more');
+        if (!content || !btn) return;
+
+        content.style.maxHeight = COLLAPSED;
+
+        btn.addEventListener('click', () => {
+          item.classList.contains('expanded') ? collapse(item) : expand(item);
         });
       });
     });
   </script>
-
- <script src="/scripts/load-header.js"></script>
- 
-</script>
 </body>
 </html>
