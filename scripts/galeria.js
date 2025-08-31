@@ -35,7 +35,6 @@ function openLightbox({ type, src, alt }) {
   } else if (type === 'video') {
     lb.vid.src = src;
     lb.vid.style.display = 'block';
-    // no autoplays en móviles; user-gesture abre el modal y luego puede play
   }
 
   if (alt && alt.trim()) {
@@ -67,33 +66,47 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && lb.root.classList.contains('open')) closeLightbox();
 });
 
-// === Utilidades ===
+// === Utilidades Google Drive ===
 function extractDriveId(raw) {
   if (!raw) return '';
   const link = String(raw).trim();
+
+  // Solo procesar si es de Drive/Docs
   if (!/drive\.google\.com|docs\.google\.com/i.test(link)) return '';
-  const m1 = link.match(/\/d\/([-\w]{25,})/);
-  const m2 = link.match(/[?&]id=([-\w]{25,})/);
-  const m3 = link.match(/([-\w]{25,})/);
-  const id = (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]) || '';
-  return id;
+
+  // /file/d/ID/...
+  const m1 = link.match(/\/d\/([-\w]{20,})/);
+  if (m1 && m1[1]) return m1[1];
+
+  // ?id=ID
+  const m2 = link.match(/[?&]id=([-\w]{20,})/);
+  if (m2 && m2[1]) return m2[1];
+
+  // uc?id=ID
+  const m3 = link.match(/uc\?[^#]*[?&]id=([-\w]{20,})/);
+  if (m3 && m3[1]) return m3[1];
+
+  // Fallback, primer token largo que parezca ID
+  const m4 = link.match(/([-\w]{20,})/);
+  return (m4 && m4[1]) || '';
 }
 
-// Dominio que funciona bien en incógnito
+// Directo confiable (imagen o video)
 function driveDirect(raw) {
   const id = extractDriveId(raw);
   if (!id) return '';
-  return `https://drive.usercontent.google.com/download?id=${id}&export=view`;
+  // Este endpoint suele andar mejor que /download?id=...
+  return `https://drive.usercontent.google.com/uc?export=download&id=${id}`;
 }
 
-// Fallback a thumbnail (por si alguna directa falla)
+// Fallback a thumbnail (para imágenes)
 function driveThumb(raw) {
   const id = extractDriveId(raw);
   if (!id) return '';
   return `https://drive.google.com/thumbnail?id=${id}&sz=w2000`;
 }
 
-// Parser CSV
+// === CSV parser (simple, tolerante a comillas) ===
 function parseCSV(text) {
   const rows = [];
   let i = 0, field = '', row = [], inQuotes = false;
@@ -147,6 +160,8 @@ const observer = new IntersectionObserver((entries, obs) => {
 function attachImage(card, src, alt, originalLinkForLog) {
   const img = document.createElement('img');
   img.loading = 'lazy';
+  img.decoding = 'async';
+  img.referrerPolicy = 'no-referrer';
   img.alt = alt || 'foto';
 
   img.addEventListener('error', () => {
@@ -160,7 +175,6 @@ function attachImage(card, src, alt, originalLinkForLog) {
 
   // Abrir visor al click
   img.addEventListener('click', () => {
-    // Usamos el src actual (ya directo) para la versión grande
     const big = img.src || src;
     openLightbox({ type: 'image', src: big, alt });
   });
@@ -200,6 +214,7 @@ async function main() {
   gridEl.innerHTML = '';
 
   const res = await fetch(CSV_URL + ((CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now()));
+  if (!res.ok) throw new Error(`No se pudo cargar CSV (${res.status})`);
   const csv = await res.text();
   const rows = parseCSV(csv);
 
@@ -220,10 +235,10 @@ async function main() {
 
     if (!isEmpty(fotoLink)) {
       const direct = driveDirect(fotoLink);
-      attachImage(card, direct, alt, fotoLink);
+      attachImage(card, direct || fotoLink, alt, fotoLink);
     } else if (!isEmpty(videoLink)) {
       const direct = driveDirect(videoLink);
-      attachVideo(card, direct, videoLink, alt);
+      attachVideo(card, direct || videoLink, videoLink, alt);
     }
 
     if (alt && String(alt).trim()) {
