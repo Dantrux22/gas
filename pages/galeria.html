@@ -4,6 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Galería (Drive + Sheets)</title>
+
+  <!-- Tokens/paleta global (desde /pages/ -> ../scripts/) -->
+  <script src="../scripts/theme.js"></script>
+
   <style>
     :root { --bg:#0b0b0b; --fg:#fff; --muted:#9aa0a6; --card:#111; --border:#222; --overlay:rgba(0,0,0,.86);}
     *{box-sizing:border-box}
@@ -46,8 +50,8 @@
 </head>
 <body>
   <!-- Header global -->
-  <div id="header-container"></div>
-  <script src="/scripts/load-header.js"></script>
+  <div id="header-placeholder"></div>
+  <script src="../scripts/load-header.js"></script>
 
   <header>
     <strong>Galería</strong> <span class="badge" id="count"></span>
@@ -69,6 +73,7 @@
     </div>
   </div>
 
-  <script src="/scripts/galeria.js"></script>
+  <!-- Tu JS de galería -->
+  <script src="../scripts/galeria.js"></script>
 </body>
 </html>
