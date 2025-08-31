@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contacto STIGAS</title>
 
-  <!-- Paleta / tokens globales -->
-  <script src="/scripts/theme.js"></script>
+  <!-- Paleta / tokens globales (rutas relativas desde /pages/) -->
+  <script src="../scripts/theme.js"></script>
 
   <style>
     /* -------- Estilos SOLO de la página de contacto (scoped) -------- */
@@ -15,152 +15,68 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Arial, sans-serif;
-
-      /* Colores globales del tema */
       background: var(--color-fondo);
       color: var(--color-texto);
     }
-
-    .contact a {
-      color: var(--color-enlace);
-      text-decoration: none;
-    }
+    .contact a { color: var(--color-enlace); text-decoration: none; }
     .contact a:hover { color: var(--color-enlace-hover); }
-
     .contact .form-wrapper {
-      flex: 1;
-      width: var(--ancho-contenedor);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-      padding: 3rem 0;
-      margin: 0 auto;
+      flex: 1; width: var(--ancho-contenedor);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2rem; padding: 3rem 0; margin: 0 auto;
     }
-
-    .contact .logo-stigas {
-      width: 120px;
-      height: auto;
-      display: block;
-      max-width: 100%;
-      filter: drop-shadow(0 2px 10px rgba(0,0,0,.08));
-    }
-
+    .contact .logo-stigas { width: 120px; height: auto; display: block; max-width: 100%; filter: drop-shadow(0 2px 10px rgba(0,0,0,.08)); }
     .contact .form-box {
-      background: var(--color-detalle);
-      color: var(--color-texto);
-      padding: 2rem;
-      border-radius: var(--radius);
-      box-shadow: var(--color-sombra);
-      width: 100%;
-      max-width: 800px;
-      position: relative;
-      border: 1px solid var(--color-borde);
+      background: var(--color-detalle); color: var(--color-texto);
+      padding: 2rem; border-radius: var(--radius); box-shadow: var(--color-sombra);
+      width: 100%; max-width: 800px; position: relative; border: 1px solid var(--color-borde);
     }
-
-    /* Franja inferior con colores de marca */
     .contact .form-box::after {
-      content: "";
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%; height: 8px;
+      content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 8px;
       background: linear-gradient(90deg, var(--color-marca), var(--color-marca-2));
       border-radius: 0 0 var(--radius) var(--radius);
     }
-
-    /* Inputs */
-    .contact .form-box input,
-    .contact .form-box textarea {
-      width: 100%;
-      padding: 12px 10px;
-      margin-bottom: 1.2rem;
-      border: none;
-      border-bottom: 2px solid var(--color-borde);
-      background: transparent;
-      font-size: 1rem;
-      color: var(--color-texto);
-      transition: border-color .25s ease, background-color .2s ease;
+    .contact .form-box input, .contact .form-box textarea {
+      width: 100%; padding: 12px 10px; margin-bottom: 1.2rem; border: none; border-bottom: 2px solid var(--color-borde);
+      background: transparent; font-size: 1rem; color: var(--color-texto); transition: border-color .25s ease, background-color .2s ease;
     }
-
-    .contact .form-box textarea {
-      height: 150px;
-      resize: vertical;
-      overflow-y: auto;
+    .contact .form-box textarea { height: 150px; resize: vertical; overflow-y: auto; }
+    .contact .form-box input::placeholder, .contact .form-box textarea::placeholder { color: var(--color-texto-secundario); opacity: .9; }
+    .contact .form-box input:focus, .contact .form-box textarea:focus {
+      border-color: var(--color-marca); outline: none; background-color: color-mix(in oklab, var(--color-detalle), #ffffff 4%);
     }
-
-    .contact .form-box input::placeholder,
-    .contact .form-box textarea::placeholder {
-      color: var(--color-texto-secundario);
-      opacity: .9;
-    }
-
-    .contact .form-box input:focus,
-    .contact .form-box textarea:focus {
-      border-color: var(--color-marca);
-      outline: none;
-      background-color: color-mix(in oklab, var(--color-detalle), #ffffff 4%);
-    }
-
-    /* Acciones */
-    .contact .form-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    /* Botón primario basado en tokens */
+    .contact .form-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
     .contact .btn-submit {
-      background: var(--color-boton);
-      color: var(--color-boton-texto);
-      border: 1px solid var(--color-boton-borde);
-      font-weight: 700;
-      padding: 12px 16px;
-      cursor: pointer;
-      border-radius: 10px;
-      box-shadow: var(--color-sombra);
+      background: var(--color-boton); color: var(--color-boton-texto); border: 1px solid var(--color-boton-borde);
+      font-weight: 700; padding: 12px 16px; cursor: pointer; border-radius: 10px; box-shadow: var(--color-sombra);
       transition: transform .04s ease, box-shadow .2s ease, background-color .25s ease;
     }
-    .contact .btn-submit:hover {
-      background: var(--color-boton-hover);
-    }
-    .contact .btn-submit:active {
-      transform: translateY(1px);
-    }
-    .contact .btn-submit:focus-visible {
-      outline: 2px solid var(--color-marca);
-      outline-offset: 2px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .contact .form-wrapper { padding: 2rem 0; }
-      .contact .form-box { padding: 1.25rem; }
-    }
-
-    /* Respeto a usuarios con motion reducido */
-    @media (prefers-reduced-motion: reduce) {
-      .contact * { transition: none !important; }
-    }
+    .contact .btn-submit:hover { background: var(--color-boton-hover); }
+    .contact .btn-submit:active { transform: translateY(1px); }
+    .contact .btn-submit:focus-visible { outline: 2px solid var(--color-marca); outline-offset: 2px; }
+    @media (max-width: 768px){ .contact .form-wrapper { padding: 2rem 0; } .contact .form-box { padding: 1.25rem; } }
+    @media (prefers-reduced-motion: reduce){ .contact * { transition: none !important; } }
     /* -------- FIN estilos scoped -------- */
   </style>
 </head>
 <body>
-  <!-- Header reutilizable (sus estilos quedan intactos) -->
+  <!-- Header reutilizable -->
   <div id="header-placeholder"></div>
 
   <!-- Contenido de Contacto -->
   <main class="contact">
     <div class="form-wrapper">
-      <img src="/fotos/LOGO STIGAS CABA.png" alt="Logo STIGAS" class="logo-stigas" />
+      <!-- Ruta RELATIVA al logo -->
+      <img src="../fotos/LOGO STIGAS CABA.png" alt="Logo STIGAS" class="logo-stigas" />
       <form action="https://formsubmit.co/dantrux22@gmail.com" method="POST" class="form-box">
         <input type="text"   name="Nombre"   placeholder="Nombre" required />
         <input type="text"   name="Apellido" placeholder="Apellido" required />
         <input type="email"  name="Gmail"    placeholder="Correo electrónico" required />
         <textarea name="mensaje" placeholder="Escriba su mensaje" required></textarea>
+
+        <!-- Opcional: redirigir a una página de gracias -->
+        <!-- <input type="hidden" name="_next" value="https://dantrux22.github.io/gas/pages/gracias.html" /> -->
 
         <div class="form-actions">
           <input type="hidden" name="_captcha" value="false" />
@@ -170,9 +86,7 @@
     </div>
   </main>
 
-  <!-- Script del header -->
-  <script src="/scripts/load-header.js"></script>
-
-  <!-- No hace falta llamar a Theme.applyLight(): los tokens ya se aplican al cargar -->
+  <!-- Script del header (RELATIVO) -->
+  <script src="../scripts/load-header.js"></script>
 </body>
 </html>
