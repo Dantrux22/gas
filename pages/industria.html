@@ -1,12 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Industria — STIGAS</title>
+  <meta name="description" content="Página Industria del Sindicato del Gas." />
+
+  <!-- Tokens / paleta global -->
+  <script src="../scripts/theme.js"></script>
+
+  <style>
+    :root { --page-max: min(1100px, 94vw); }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      background:var(--color-fondo, #fff); color:var(--color-texto, #111827);
+    }
+    .page-header{ padding:20px 0; border-bottom:1px solid var(--color-borde, #e5e7eb); }
+    .page-hero{ display:flex; justify-content:center; padding:24px 0; }
+    .page-hero img{ height:84px; width:auto; display:block; }
+    .page-container{ width:var(--page-max); margin:0 auto; padding:24px 10px; }
+    .page-title{ margin:0 0 .5rem; font-weight:800; font-size:clamp(1.6rem,2.7vw,2.2rem); }
+    .page-lead{ margin:0; color:var(--color-texto-secundario, #6b7280); }
+  </style>
 </head>
 <body>
-    <div id="header-placeholder"></div>
-  <script src="../scripts/galeria.js"></script>
+  <!-- Header global -->
+  <div id="header-placeholder"></div>
+  <script src="../scripts/load-header.js"></script>
+
+  <!-- Contenido de la página -->
+  <section class="page-header">
+    <div class="page-hero">
+      <img src="../fotos/LOGO STIGAS CABA.png" alt="Logo STIGAS" />
+    </div>
+    <div class="page-container">
+      <h1 class="page-title">Industria</h1>
+      <p class="page-lead">Página Industria</p>
+    </div>
+  </section>
+
+  <main class="page-container">
+    <!-- Contenido futuro -->
+  </main>
 </body>
 </html>

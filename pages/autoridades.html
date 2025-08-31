@@ -1,21 +1,48 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://cdn.pixabay.com/photo/2020/10/24/07/38/logo-5680703_1280.png">
-    <link rel="stylesheet" href="../css/menu.css">
-    <link rel="stylesheet" href="../css/nosotros-responsive.css">
-    <title>Cafe de las mañanas</title>
- </head>
- <body>
-    <!-- NAV     -->
-    <div id="header-placeholder"></div>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autoridades — STIGAS</title>
+  <meta name="description" content="Página Autoridades del Sindicato del Gas." />
 
+  <!-- Tokens / paleta global -->
+  <script src="../scripts/theme.js"></script>
 
-  <script src="../scripts/galeria.js"></script>
+  <style>
+    :root { --page-max: min(1100px, 94vw); }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      background:var(--color-fondo, #fff); color:var(--color-texto, #111827);
+    }
+    /* Estilos encapsulados de la página (no pisan el header global) */
+    .page-header{ padding:20px 0; border-bottom:1px solid var(--color-borde, #e5e7eb); }
+    .page-hero{ display:flex; justify-content:center; padding:24px 0; }
+    .page-hero img{ height:84px; width:auto; display:block; }
+    .page-container{ width:var(--page-max); margin:0 auto; padding:24px 10px; }
+    .page-title{ margin:0 0 .5rem; font-weight:800; font-size:clamp(1.6rem,2.7vw,2.2rem); }
+    .page-lead{ margin:0; color:var(--color-texto-secundario, #6b7280); }
+  </style>
+</head>
+<body>
+  <!-- Header global -->
+  <div id="header-placeholder"></div>
+  <script src="../scripts/load-header.js"></script>
 
+  <!-- Contenido de la página -->
+  <section class="page-header">
+    <div class="page-hero">
+      <img src="../fotos/LOGO STIGAS CABA.png" alt="Logo STIGAS" />
+    </div>
+    <div class="page-container">
+      <h1 class="page-title">Autoridades</h1>
+      <p class="page-lead">Página Autoridades</p>
+    </div>
+  </section>
 
-    
- </body>
- </html>
+  <main class="page-container">
+    <!-- Contenido futuro -->
+  </main>
+</body>
+</html>
