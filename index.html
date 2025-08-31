@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Sindicato del Gas: trámites, turnos, beneficios para afiliados, capacitaciones y novedades." />
   <meta name="theme-color" content="#085e75" />
-  <link rel="icon" href="/fotos/LOGO STIGAS CABA.png" />
+
+  <!-- 👇 Importante: rutas relativas (NO empezar con "/") -->
+  <link rel="icon" href="./fotos/LOGO STIGAS CABA.png" />
   <link rel="stylesheet" href="./css/header.css" />
   <title>Sindicato del Gas — Inicio</title>
 
   <!-- Paleta global (debe ir antes del <style>) -->
-  <script src="/scripts/theme.js"></script>
+  <!-- 👇 Importante: ruta relativa -->
+  <script src="./scripts/theme.js"></script>
 
   <!-- ===== Estilos DEL INDEX (inline) ===== -->
   <style>
@@ -149,7 +152,6 @@
 
   <main id="main" role="main">
     <!-- ===== SLIDER ===== -->
-    <!-- (tu slider queda exactamente igual que el que enviaste) -->
     <section class="hero" aria-label="Campañas destacadas">
       <div class="slides" data-slides>
         <!-- 1 -->
@@ -160,7 +162,8 @@
               <span class="cap-eyebrow">Institucional</span>
               <h2 class="cap-title">Un Sindicato del Gas más cerca de los trabajadores</h2>
               <p class="cap-sub">Representación, diálogo y transparencia para defender tus derechos y mejorar tus condiciones laborales.</p>
-              <a class="btn-cta" href="/pages/historia.html">Conocé más</a>
+              <!-- 👇 Ruta relativa (el JS también cubrirá las absolutas si hubiera) -->
+              <a class="btn-cta" href="./pages/historia.html">Conocé más</a>
             </div>
           </figcaption>
         </figure>
@@ -173,7 +176,7 @@
               <span class="cap-eyebrow">Servicios</span>
               <h2 class="cap-title">Trámites y turnos 100% online</h2>
               <p class="cap-sub">Solicitá turnos para inspecciones, homologaciones y certificaciones de manera rápida y segura.</p>
-              <a class="btn-cta" href="/pages/contactanos.html">Sacá turno</a>
+              <a class="btn-cta" href="./pages/contactanos.html">Sacá turno</a>
             </div>
           </figcaption>
         </figure>
@@ -186,7 +189,7 @@
               <span class="cap-eyebrow">Beneficios</span>
               <h2 class="cap-title">Beneficios y asesoramiento para afiliados</h2>
               <p class="cap-sub">Accedé a convenios, asesoría legal y programas de bienestar para vos y tu familia.</p>
-              <a class="btn-cta" href="/pages/novedades.html">Ver beneficios</a>
+              <a class="btn-cta" href="./pages/novedades.html">Ver beneficios</a>
             </div>
           </figcaption>
         </figure>
@@ -199,7 +202,7 @@
               <span class="cap-eyebrow">Capacitaciones</span>
               <h2 class="cap-title">Seguridad y formación continua</h2>
               <p class="cap-sub">Cursos, jornadas y material técnico para elevar el estándar de seguridad en cada tarea.</p>
-              <a class="btn-cta" href="/pages/novedades.html">Próximas fechas</a>
+              <a class="btn-cta" href="./pages/novedades.html">Próximas fechas</a>
             </div>
           </figcaption>
         </figure>
@@ -212,7 +215,7 @@
               <span class="cap-eyebrow">Contacto</span>
               <h2 class="cap-title">Delegaciones y canales de atención</h2>
               <p class="cap-sub">Encontrá tu delegación más cercana o escribinos para consultas y reclamos.</p>
-              <a class="btn-cta" href="/pages/contactanos.html">Ver contactos</a>
+              <a class="btn-cta" href="./pages/contactanos.html">Ver contactos</a>
             </div>
           </figcaption>
         </figure>
@@ -228,7 +231,7 @@
       <div class="inner">
         <span>📢</span>
         <span>Paritarias 2025: acta acuerdo y escalas actualizadas disponibles.</span>
-        <a href="/pages/novedades.html">Ver documentación</a>
+        <a href="./pages/novedades.html">Ver documentación</a>
       </div>
     </section>
   </main>
@@ -314,8 +317,6 @@
   <!-- Esta página en particular: modo CLARO -->
   <script>
     Theme.applyLight();
-    // Si querés ajustar algo solo para el inicio:
-    // Theme.set({'--accent-500':'#ff8a3d'});
   </script>
 </body>
 </html>

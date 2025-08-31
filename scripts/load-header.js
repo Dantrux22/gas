@@ -2,19 +2,29 @@
 (function () {
   const PLACEHOLDER_ID = 'header-placeholder';
 
-  // Base = carpeta donde vive ESTE script (p.ej. /scripts/)
+  // Base = carpeta donde vive ESTE script (p.ej. https://user.github.io/REPO/scripts/)
   const SCRIPT_URL = document.currentScript?.src || '';
   const BASE = new URL('.', SCRIPT_URL || location.href);
 
   // Rutas del parcial y del CSS, relativas al script
-  const PARTIAL_URL = new URL('../partials/header.html', BASE).href; // -> /partials/header.html
-  const CSS_URL     = new URL('../css/header.css', BASE).href;       // -> /css/header.css
+  const PARTIAL_URL = new URL('../partials/header.html', BASE).href; // -> .../partials/header.html
+  const CSS_URL     = new URL('../css/header.css', BASE).href;       // -> .../css/header.css
+
+  // Repo base (con subcarpeta) p.ej. "https://user.github.io/REPO/"
+  const REPO_BASE_URL = new URL('..', BASE);
+
+  function repoRootPath() {
+    let p = REPO_BASE_URL.pathname || '/';
+    if (!p.endsWith('/')) p += '/';
+    return p; // p.ej. "/REPO/" o "/"
+  }
 
   async function injectHeader() {
     // si ya hay un header, no hagas nada
     if (document.querySelector('[data-header]')) {
       ensureHeaderStylesheet();
       wireUpHeaderInteractions();
+      patchInternalLinks();
       markActiveLink();
       return;
     }
@@ -37,6 +47,8 @@
 
       ensureHeaderStylesheet();
       wireUpHeaderInteractions();
+      // 👇 también reescribimos ENLACES de toda la página (header + contenido)
+      patchInternalLinks();
       markActiveLink();
     } catch (e) {
       console.error('load-header:', e);
@@ -86,13 +98,53 @@
     }
   }
 
+  /**
+   * Reescribe cualquier href que empiece con "/" para que incluya el subpath del repo.
+   * Ej.: "/pages/historia.html" -> "/REPO/pages/historia.html" en GitHub Pages.
+   * También corrige el favicon si estaba absoluto.
+   */
+  function patchInternalLinks() {
+    const root = repoRootPath();                 // "/REPO/" o "/"
+    const origin = location.origin;              // "https://user.github.io"
+
+    // Enlaces <a>
+    document.querySelectorAll('a[href^="/"]').forEach(a => {
+      const raw = a.getAttribute('href') || '/';
+      if (raw === '/') {
+        a.setAttribute('href', origin + root);
+        return;
+      }
+      const clean = raw.replace(/^\//, '');      // "pages/historia.html"
+      a.setAttribute('href', origin + root + clean);
+    });
+
+    // Favicon / iconos
+    document.querySelectorAll('link[rel="icon"][href^="/"]').forEach(l => {
+      const clean = (l.getAttribute('href') || '').replace(/^\//, '');
+      l.href = origin + root + clean;
+    });
+  }
+
   function markActiveLink() {
-    const path = location.pathname.replace(/\/index\.html?$/, '/');
+    const path = location.pathname; // p.ej. "/REPO/pages/historia.html"
     document.querySelectorAll('.nav-list a[href]').forEach(a => {
       const href = a.getAttribute('href');
       if (!href) return;
-      if (href !== '/' && path.startsWith(href)) a.classList.add('is-active');
-      else if (href === '/' && (path === '/' || path.endsWith('/index.html'))) a.classList.add('is-active');
+      let hrefPath = href;
+      try {
+        hrefPath = new URL(href, location.origin).pathname;
+      } catch (_) {}
+      // Home
+      if (hrefPath === '/' || hrefPath.endsWith('/index.html')) {
+        if (path === hrefPath || path === repoRootPath() || path.endsWith('/index.html')) {
+          a.classList.add('is-active');
+        }
+        return;
+      }
+      // Coincidencia por prefijo (sección activa)
+      if (hrefPath !== '/' && path.startsWith(hrefPath)) {
+        a.classList.add('is-active');
+      }
     });
   }
 
