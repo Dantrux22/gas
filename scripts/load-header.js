@@ -2,7 +2,7 @@
 (function () {
   const PLACEHOLDER_ID = 'header-placeholder';
 
-  // Base = carpeta donde vive ESTE script (p.ej. https://user.github.io/REPO/scripts/)
+  // Base = carpeta donde vive ESTE script (p.ej. https://usuario.github.io/gas/scripts/)
   const SCRIPT_URL = document.currentScript?.src || '';
   const BASE = new URL('.', SCRIPT_URL || location.href);
 
@@ -10,13 +10,12 @@
   const PARTIAL_URL = new URL('../partials/header.html', BASE).href; // -> .../partials/header.html
   const CSS_URL     = new URL('../css/header.css', BASE).href;       // -> .../css/header.css
 
-  // Repo base (con subcarpeta) p.ej. "https://user.github.io/REPO/"
+  // Repo base (con subcarpeta), ej. "/gas/"
   const REPO_BASE_URL = new URL('..', BASE);
-
   function repoRootPath() {
     let p = REPO_BASE_URL.pathname || '/';
     if (!p.endsWith('/')) p += '/';
-    return p; // p.ej. "/REPO/" o "/"
+    return p;
   }
 
   async function injectHeader() {
@@ -24,12 +23,11 @@
     if (document.querySelector('[data-header]')) {
       ensureHeaderStylesheet();
       wireUpHeaderInteractions();
-      patchInternalLinks();
+      patchInternalLinksAndMedia();
       markActiveLink();
       return;
     }
 
-    // buscar placeholder si existe
     const target = document.getElementById(PLACEHOLDER_ID);
 
     try {
@@ -38,17 +36,15 @@
       const html = await res.text();
 
       if (target) {
-        // Reemplaza placeholder por el header
-        target.outerHTML = html;
+        target.outerHTML = html; // Reemplaza placeholder por el header
       } else {
-        // Inserta el header como primer hijo del <body>
         document.body.insertAdjacentHTML('afterbegin', html);
       }
 
       ensureHeaderStylesheet();
       wireUpHeaderInteractions();
-      // 👇 también reescribimos ENLACES de toda la página (header + contenido)
-      patchInternalLinks();
+      // 👇 Corrige enlaces del header y del resto del DOM ya presente
+      patchInternalLinksAndMedia();
       markActiveLink();
     } catch (e) {
       console.error('load-header:', e);
@@ -99,48 +95,86 @@
   }
 
   /**
-   * Reescribe cualquier href que empiece con "/" para que incluya el subpath del repo.
-   * Ej.: "/pages/historia.html" -> "/REPO/pages/historia.html" en GitHub Pages.
-   * También corrige el favicon si estaba absoluto.
+   * Reescribe URLs absolutas (que empiezan con "/") para incluir el subpath del repo.
+   * Aplica a:
+   *  - <a href>
+   *  - <link rel="icon"/"apple-touch-icon"/"manifest" href>
+   *  - <img src>, <img srcset>, <source src/srcset>, <video src/poster>
    */
-  function patchInternalLinks() {
-    const root = repoRootPath();                 // "/REPO/" o "/"
-    const origin = location.origin;              // "https://user.github.io"
+  function patchInternalLinksAndMedia() {
+    const root = repoRootPath();    // "/gas/" o "/"
+    const origin = location.origin; // "https://usuario.github.io"
 
-    // Enlaces <a>
+    const fixUrl = (u) => {
+      if (!u || typeof u !== 'string') return u;
+      if (/^(https?:)?\/\//i.test(u)) return u; // ya es absoluta/externa
+      if (u === '/') return origin + root;      // home
+      if (u.startsWith('/')) return origin + root + u.replace(/^\//, '');
+      return u;
+    };
+
+    // <a href="/...">
     document.querySelectorAll('a[href^="/"]').forEach(a => {
-      const raw = a.getAttribute('href') || '/';
-      if (raw === '/') {
-        a.setAttribute('href', origin + root);
-        return;
-      }
-      const clean = raw.replace(/^\//, '');      // "pages/historia.html"
-      a.setAttribute('href', origin + root + clean);
+      a.setAttribute('href', fixUrl(a.getAttribute('href') || '/'));
     });
 
-    // Favicon / iconos
-    document.querySelectorAll('link[rel="icon"][href^="/"]').forEach(l => {
-      const clean = (l.getAttribute('href') || '').replace(/^\//, '');
-      l.href = origin + root + clean;
+    // favicon / manifest
+    document.querySelectorAll('link[rel="icon"][href^="/"], link[rel="apple-touch-icon"][href^="/"], link[rel="manifest"][href^="/"]').forEach(l => {
+      l.setAttribute('href', fixUrl(l.getAttribute('href') || ''));
+    });
+
+    // <img src="/...">, <source src="/...">, <video src="/...">
+    document.querySelectorAll('img[src^="/"], source[src^="/"], video[src^="/"]').forEach(el => {
+      el.setAttribute('src', fixUrl(el.getAttribute('src') || ''));
+    });
+
+    // <video poster="/...">
+    document.querySelectorAll('video[poster^="/"]').forEach(v => {
+      v.setAttribute('poster', fixUrl(v.getAttribute('poster') || ''));
+    });
+
+    // srcset en <img> y <source>
+    const rewriteSrcset = (val) => {
+      if (!val) return val;
+      return val.split(',').map(part => {
+        const p = part.trim();
+        const m = p.match(/^(\S+)(\s+.+)?$/); // URL [espacio descriptor]
+        if (!m) return p;
+        const url = m[1];
+        const desc = m[2] || '';
+        return (fixUrl(url) + desc);
+      }).join(', ');
+    };
+    document.querySelectorAll('img[srcset], source[srcset]').forEach(el => {
+      const v = el.getAttribute('srcset');
+      if (v && /^\s*\/\S/.test(v)) {
+        el.setAttribute('srcset', rewriteSrcset(v));
+      }
+    });
+
+    // SVG <use href="/...">
+    document.querySelectorAll('use[href^="/"]').forEach(u => {
+      u.setAttribute('href', fixUrl(u.getAttribute('href') || ''));
     });
   }
 
   function markActiveLink() {
-    const path = location.pathname; // p.ej. "/REPO/pages/historia.html"
+    const path = location.pathname; // ej. "/gas/pages/historia.html"
+    const root = repoRootPath();
     document.querySelectorAll('.nav-list a[href]').forEach(a => {
       const href = a.getAttribute('href');
       if (!href) return;
       let hrefPath = href;
-      try {
-        hrefPath = new URL(href, location.origin).pathname;
-      } catch (_) {}
+      try { hrefPath = new URL(href, location.origin).pathname; } catch (_) {}
+
       // Home
-      if (hrefPath === '/' || hrefPath.endsWith('/index.html')) {
-        if (path === hrefPath || path === repoRootPath() || path.endsWith('/index.html')) {
+      if (hrefPath === '/' || hrefPath.endsWith('/index.html') || hrefPath === root) {
+        if (path === hrefPath || path === root || path.endsWith('/index.html')) {
           a.classList.add('is-active');
         }
         return;
       }
+
       // Coincidencia por prefijo (sección activa)
       if (hrefPath !== '/' && path.startsWith(hrefPath)) {
         a.classList.add('is-active');
