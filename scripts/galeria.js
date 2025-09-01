@@ -1,5 +1,7 @@
 /**************
  * GALERÍA JS *
+ * v3.0: Ordena primero FOTOS y al final VIDEOS (col B)
+ *         + soporte Google Drive + YouTube + MP4 directo
  **************/
 
 // === Config ===
@@ -8,13 +10,14 @@ const CSV_URL =
 
 // A=foto, B=video, C=alt
 const HEADERS = { foto: 0, video: 1, alt: 2 };
-const DEBUG_NO_LAZY = false; // poné true si querés desactivar lazy para depurar
+const DEBUG_NO_LAZY = false; // true para desactivar lazy en debug
 
 // === Lightbox refs ===
 const lb = {
   root: document.getElementById('lightbox'),
   img: document.getElementById('lightboxImg'),
   vid: document.getElementById('lightboxVid'),
+  frame: document.getElementById('lightboxFrame'), // iframe para Drive / YouTube
   caption: document.getElementById('lightboxCaption'),
   closeBtn: document.getElementById('lightboxClose'),
   content: document.getElementById('lightboxContent')
@@ -25,8 +28,13 @@ function openLightbox({ type, src, alt }) {
   // limpiar estado
   lb.img.style.display = 'none';
   lb.vid.style.display = 'none';
+  lb.frame.style.display = 'none';
   lb.caption.style.display = 'none';
-  lb.vid.pause();
+
+  lb.vid.pause?.();
+  lb.img.src = '';
+  lb.vid.src = '';
+  lb.frame.src = '';
 
   if (type === 'image') {
     lb.img.src = src;
@@ -35,6 +43,10 @@ function openLightbox({ type, src, alt }) {
   } else if (type === 'video') {
     lb.vid.src = src;
     lb.vid.style.display = 'block';
+  } else if (type === 'frame') {
+    // Player embebido (Drive o YouTube)
+    lb.frame.src = src;
+    lb.frame.style.display = 'block';
   }
 
   if (alt && alt.trim()) {
@@ -50,10 +62,10 @@ function openLightbox({ type, src, alt }) {
 function closeLightbox() {
   lb.root.classList.remove('open');
   lb.root.setAttribute('aria-hidden', 'true');
-  lb.vid.pause();
-  // liberar para que no siga consumiendo datos
+  lb.vid.pause?.();
   lb.img.src = '';
   lb.vid.src = '';
+  lb.frame.src = '';
   document.body.style.overflow = '';
 }
 
@@ -66,70 +78,40 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && lb.root.classList.contains('open')) closeLightbox();
 });
 
-// === Utilidades Google Drive ===
+// === Utilidades ===
+function isEmpty(v) { return !v || String(v).trim() === '' || String(v).toLowerCase() === 'null'; }
+function isDriveLink(u){ return /drive\.google\.com|docs\.google\.com/i.test(String(u||'')); }
+function isYouTubeLink(u){ return /youtu\.be|youtube\.com/i.test(String(u||'')); }
+function isLikelyVideoUrl(u){ return /\.(mp4|webm|ogg)(\?|$)/i.test(String(u||'')); }
+
 function extractDriveId(raw) {
   if (!raw) return '';
   const link = String(raw).trim();
-
-  // Solo procesar si es de Drive/Docs
   if (!/drive\.google\.com|docs\.google\.com/i.test(link)) return '';
-
-  // /file/d/ID/...
-  const m1 = link.match(/\/d\/([-\w]{20,})/);
-  if (m1 && m1[1]) return m1[1];
-
-  // ?id=ID
-  const m2 = link.match(/[?&]id=([-\w]{20,})/);
-  if (m2 && m2[1]) return m2[1];
-
-  // uc?id=ID
-  const m3 = link.match(/uc\?[^#]*[?&]id=([-\w]{20,})/);
-  if (m3 && m3[1]) return m3[1];
-
-  // Fallback, primer token largo que parezca ID
-  const m4 = link.match(/([-\w]{20,})/);
-  return (m4 && m4[1]) || '';
+  const m1 = link.match(/\/d\/([-\w]{25,})/);
+  const m2 = link.match(/[?&]id=([-\w]{25,})/);
+  const m3 = link.match(/([-\w]{25,})/);
+  return (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]) || '';
 }
+function driveDirect(raw){ const id = extractDriveId(raw); return id ? `https://drive.usercontent.google.com/download?id=${id}&export=view` : ''; }
+function driveThumb(raw, size=2000){ const id = extractDriveId(raw); return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w${size}` : ''; }
+function drivePreview(raw, autoplay=false){ const id = extractDriveId(raw); return id ? `https://drive.google.com/file/d/${id}/preview${autoplay ? '?autoplay=1' : ''}` : ''; }
 
-// Directo confiable (imagen o video)
-function driveDirect(raw) {
-  const id = extractDriveId(raw);
-  if (!id) return '';
-  // Este endpoint suele andar mejor que /download?id=...
-  return `https://drive.usercontent.google.com/uc?export=download&id=${id}`;
+function extractYouTubeId(u){
+  if (!u) return '';
+  const s = String(u);
+  let m = s.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/);
+  if (m) return m[1];
+  m = s.match(/[?&]v=([A-Za-z0-9_-]{6,})/);
+  if (m) return m[1];
+  m = s.match(/\/embed\/([A-Za-z0-9_-]{6,})/);
+  return m ? m[1] : '';
 }
-
-// Fallback a thumbnail (para imágenes)
-function driveThumb(raw) {
-  const id = extractDriveId(raw);
-  if (!id) return '';
-  return `https://drive.google.com/thumbnail?id=${id}&sz=w2000`;
+function youtubeThumb(u){ const id = extractYouTubeId(u); return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : ''; }
+function youtubeEmbed(u, autoplay=false){
+  const id = extractYouTubeId(u);
+  return id ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&playsinline=1${autoplay ? '&autoplay=1' : ''}` : '';
 }
-
-// === CSV parser (simple, tolerante a comillas) ===
-function parseCSV(text) {
-  const rows = [];
-  let i = 0, field = '', row = [], inQuotes = false;
-  while (i < text.length) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; }
-        else { inQuotes = false; }
-      } else { field += c; }
-    } else {
-      if (c === '"') inQuotes = true;
-      else if (c === ',') { row.push(field); field = ''; }
-      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-      else if (c !== '\r') field += c;
-    }
-    i++;
-  }
-  if (field.length || row.length) { row.push(field); rows.push(row); }
-  return rows.filter(r => r.some(v => v && String(v).trim() !== ''));
-}
-
-function isEmpty(v) { return !v || String(v).trim() === '' || String(v).toLowerCase() === 'null'; }
 
 // === Lazy loading ===
 function lazyLoadify(el, src) {
@@ -156,12 +138,10 @@ const observer = new IntersectionObserver((entries, obs) => {
   });
 }, { rootMargin: '200px' });
 
-// === Render helpers (agregan click para abrir lightbox) ===
+// === Render helpers ===
 function attachImage(card, src, alt, originalLinkForLog) {
   const img = document.createElement('img');
   img.loading = 'lazy';
-  img.decoding = 'async';
-  img.referrerPolicy = 'no-referrer';
   img.alt = alt || 'foto';
 
   img.addEventListener('error', () => {
@@ -173,7 +153,6 @@ function attachImage(card, src, alt, originalLinkForLog) {
     card.appendChild(warn);
   }, { once: true });
 
-  // Abrir visor al click
   img.addEventListener('click', () => {
     const big = img.src || src;
     openLightbox({ type: 'image', src: big, alt });
@@ -183,7 +162,70 @@ function attachImage(card, src, alt, originalLinkForLog) {
   card.appendChild(img);
 }
 
-function attachVideo(card, src, originalLinkForLog, alt) {
+// Miniatura + badge para videos de Google Drive (abre iframe preview)
+function attachDriveVideo(card, driveLink, alt) {
+  const thumb = driveThumb(driveLink, 1600);
+  const preview = drivePreview(driveLink, true);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'video-thumb';
+
+  const img = document.createElement('img');
+  img.alt = alt || 'video';
+
+  img.addEventListener('error', () => {
+    const warn = document.createElement('div');
+    warn.className = 'caption';
+    warn.innerHTML = '⚠️ Revisá permisos del archivo de Drive (debe ser "Cualquiera con el enlace"). ' +
+                     `<a href="${driveLink}" target="_blank" rel="noopener">Abrir en Drive</a>`;
+    card.appendChild(warn);
+  }, { once:true });
+
+  lazyLoadify(img, thumb);
+
+  const badge = document.createElement('div');
+  badge.className = 'play-badge';
+  badge.textContent = '▶';
+
+  wrap.appendChild(img);
+  wrap.appendChild(badge);
+  wrap.addEventListener('click', () => openLightbox({ type:'frame', src: preview, alt }));
+
+  card.appendChild(wrap);
+}
+
+// Videos de YouTube (miniatura + player embebido)
+function attachYouTubeVideo(card, link, alt){
+  const thumb = youtubeThumb(link);
+  const preview = youtubeEmbed(link, true);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'video-thumb';
+
+  const img = document.createElement('img');
+  img.alt = alt || 'video';
+  img.addEventListener('error', () => {
+    const warn = document.createElement('div');
+    warn.className = 'caption';
+    warn.innerHTML = '⚠️ No se pudo cargar miniatura de YouTube. ' +
+                     `<a href="${link}" target="_blank" rel="noopener">Abrir</a>`;
+    card.appendChild(warn);
+  }, { once:true });
+  lazyLoadify(img, thumb);
+
+  const badge = document.createElement('div');
+  badge.className = 'play-badge';
+  badge.textContent = '▶';
+
+  wrap.appendChild(img);
+  wrap.appendChild(badge);
+  wrap.addEventListener('click', () => openLightbox({ type:'frame', src: preview, alt }));
+
+  card.appendChild(wrap);
+}
+
+// Videos directos (mp4/webm/ogg) con <video> nativo
+function attachDirectVideo(card, src, alt) {
   const vid = document.createElement('video');
   vid.controls = true;
   vid.preload = 'none';
@@ -192,13 +234,12 @@ function attachVideo(card, src, originalLinkForLog, alt) {
   vid.addEventListener('error', () => {
     const warn = document.createElement('div');
     warn.className = 'caption';
-    warn.textContent = '⚠️ No se pudo cargar el video (revisá permisos o probá YouTube no listado)';
+    warn.textContent = '⚠️ No se pudo cargar el video (revisá permisos o probá Google Drive/YouTube)';
     card.appendChild(warn);
   }, { once: true });
 
-  // Click en la tarjeta para abrir en visor (más cómodo en mobile)
+  // Click en la tarjeta abre el video grande
   card.addEventListener('click', (e) => {
-    // Evitar conflicto si el usuario tocó los controles del video en miniatura
     if (e.target.tagName.toLowerCase() === 'video' || e.target.closest('button')) return;
     const current = vid.currentSrc || src;
     openLightbox({ type: 'video', src: current, alt });
@@ -208,37 +249,87 @@ function attachVideo(card, src, originalLinkForLog, alt) {
   card.appendChild(vid);
 }
 
+// --- CSV parser chiquito (soporta comillas) ---
+function parseCSV(text) {
+  const rows = [];
+  let i = 0, field = '', row = [], inQuotes = false;
+  while (i < text.length) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else { inQuotes = false; }
+      } else { field += c; }
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c !== '\r') field += c;
+    }
+    i++;
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(v => v && String(v).trim() !== ''));
+}
+
 // === App ===
 async function main() {
   const gridEl = document.getElementById('grid');
   gridEl.innerHTML = '';
 
   const res = await fetch(CSV_URL + ((CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now()));
-  if (!res.ok) throw new Error(`No se pudo cargar CSV (${res.status})`);
   const csv = await res.text();
   const rows = parseCSV(csv);
 
   const headerLooksLikeHeader = rows[0] && rows[0].some(cell => /foto|video|alt/i.test(String(cell || '')));
   const data = headerLooksLikeHeader ? rows.slice(1) : rows;
 
-  let total = 0;
+  // 👉 Particionamos: primero FOTOS, después VIDEOS
+  const photos = [];
+  const videos = [];
 
   data.forEach(cols => {
-    const fotoLink = cols[HEADERS.foto] || '';
+    const fotoLink  = cols[HEADERS.foto]  || '';
     const videoLink = cols[HEADERS.video] || '';
-    const alt = cols[HEADERS.alt] || '';
+    const alt       = cols[HEADERS.alt]   || '';
 
-    if (isEmpty(fotoLink) && isEmpty(videoLink)) return;
+    const hasFoto  = !isEmpty(fotoLink);
+    const hasVideo = !isEmpty(videoLink);
 
+    if (!hasFoto && !hasVideo) return;
+
+    // Si hay video en la fila, lo tratamos como "video" (irá al final)
+    if (hasVideo) {
+      videos.push({ fotoLink, videoLink, alt });
+    } else {
+      photos.push({ fotoLink, videoLink: '', alt });
+    }
+  });
+
+  const ordered = [...photos, ...videos]; // ✅ fotos primero, videos al final
+  let total = 0;
+
+  ordered.forEach(({ fotoLink, videoLink, alt }) => {
     const card = document.createElement('div');
     card.className = 'item';
 
-    if (!isEmpty(fotoLink)) {
-      const direct = driveDirect(fotoLink);
-      attachImage(card, direct || fotoLink, alt, fotoLink);
-    } else if (!isEmpty(videoLink)) {
-      const direct = driveDirect(videoLink);
-      attachVideo(card, direct || videoLink, videoLink, alt);
+    if (videoLink && !isEmpty(videoLink)) {
+      if (isDriveLink(videoLink)) {
+        attachDriveVideo(card, videoLink, alt);
+      } else if (isYouTubeLink(videoLink)) {
+        attachYouTubeVideo(card, videoLink, alt);
+      } else if (isLikelyVideoUrl(videoLink)) {
+        attachDirectVideo(card, videoLink, alt);
+      } else {
+        const warn = document.createElement('div');
+        warn.className = 'caption';
+        warn.innerHTML = '⚠️ Enlace de video no compatible. ' +
+                         `<a href="${videoLink}" target="_blank" rel="noopener">Abrir</a>`;
+        card.appendChild(warn);
+      }
+    } else {
+      const src = isDriveLink(fotoLink) ? driveDirect(fotoLink) : fotoLink;
+      attachImage(card, src, alt, fotoLink);
     }
 
     if (alt && String(alt).trim()) {
