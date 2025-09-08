@@ -344,5 +344,30 @@ Los nuevos dirigentes fueron ovacionados por cientos de compañeros que asistier
   <script>
     Theme.applyLight();
   </script>
+
+  <!-- Forzar paleta clara y alto contraste (sin tocar los estilos) -->
+  <script>
+    (function () {
+      const r = document.documentElement;
+      const set = (k,v) => r.style.setProperty(k, v);
+
+      // Fondo claro y texto oscuro
+      set('--color-fondo', '#F8FAFC');        // gris muy claro
+      set('--color-texto', '#0F172A');        // slate-900
+
+      // Tarjetas y detalles
+      set('--color-detalle', '#FFFFFF');      // tarjetas blancas
+      set('--color-borde', 'rgba(15,23,42,0.08)'); // borde sutil
+
+      // Marca / acentos (buen contraste sobre fondo claro)
+      set('--color-marca', '#0B5ED7');        // azul accesible
+      set('--color-marca-2', '#084298');      // azul más oscuro (gradiente)
+      set('--color-enlace', '#0B5ED7');
+      set('--color-enlace-hover', '#084298');
+
+      // Sombras suaves para lectura cómoda
+      set('--color-sombra', '0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.08)');
+    })();
+  </script>
 </body>
 </html>
