@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="../fotos/LOGO STIGAS CABA.png" />
+  <link rel="icon" href="../fotos/logo stigas LETRA BLANCA.png" />
   <title>Novedades</title>
   <meta name="description" content="Página Novedades del Sindicato del Gas." />
 
@@ -118,7 +118,7 @@
   <!-- Encabezado -->
   <section class="page-header">
     <div class="page-hero">
-      <img src="../fotos/LOGO STIGAS CABA.png" alt="Logo STIGAS" />
+      <img src="../fotos/logo stigas LETRA BLANCA.png" alt="Logo STIGAS" />
     </div>
     <div class="page-container">
       <h1 class="page-title">Novedades</h1>
@@ -131,6 +131,14 @@
     <div id="news-root" aria-live="polite"></div>
     <noscript>Activá JavaScript para ver las novedades.</noscript>
   </main>
+
+  <!-- Nota: si querés indicar manualmente la ruta del Excel, podés agregar esto en el <head>:
+       <meta name="news-xlsx" content="../data/links.xlsx">
+       o definir globalmente window.NEWS_XLSX_URL antes de cargar novedades.js
+  -->
+
+  <!-- Librería para leer Excel (SheetJS). Se carga antes de novedades.js -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <!-- Código de Novedades -->
   <script src="../scripts/novedades.js"></script>

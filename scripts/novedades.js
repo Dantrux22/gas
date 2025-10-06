@@ -1,163 +1,93 @@
-/* Novedades – render agrupado por Mes/Año
-   Requiere un array de items con al menos: { title, url, date, description?, image?, tags? }
-   - date: cadena ISO o parseable por Date (p.ej. "2025-08-14", "2023-08-01T10:00:00Z")
-   - Si no tenés una fuente externa, podés usar el array NEWS de ejemplo de abajo.
-*/
+/* novedades.js - carga noticias desde CSV y obtiene metadata de los links via Microlink */
 
-// ---------------------------------------------------------------------------
-// 1) DATA (ejemplo). Si ya cargás tus noticias desde otro script, borrá/ignora esto.
-// ---------------------------------------------------------------------------
-const NEWS = (typeof window.NEWS !== "undefined" && Array.isArray(window.NEWS))
-  ? window.NEWS
-  : [
-      {
-        title: "Paritaria: acuerdo y nuevos tramos",
-        url: "https://example.com/nota-paritaria",
-        date: "2025-08-14",
-        description: "Resumen del acta y próximos pasos.",
-        image: "https://picsum.photos/seed/paritaria/800/450",
-        tags: ["Paritaria","Acta"]
-      },
-      {
-        title: "Jornada de capacitación sindical",
-        url: "https://example.com/capacitacion",
-        date: "2025-08-05",
-        description: "Temario y materiales disponibles.",
-        image: "https://picsum.photos/seed/capacitacion/800/450",
-        tags: ["Capacitación"]
-      },
-      {
-        title: "Beneficios de obra social",
-        url: "https://example.com/obra-social",
-        date: "2025-07-22",
-        description: "Nuevos convenios y prestadores.",
-        image: "https://picsum.photos/seed/obra/800/450",
-        tags: ["Obra Social"]
-      },
-      {
-        title: "Inauguración de sede",
-        url: "https://example.com/sede",
-        date: "2023-08-10",
-        description: "Galería de fotos y palabras de apertura.",
-        image: "https://picsum.photos/seed/sede/800/450",
-        tags: ["Institucional"]
-      }
-    ];
+// ----------------------------- Config -------------------------------------
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTtvsVesumUVUQgoMy_rwAilVvShXE9rtsdxga9EYtMaWRUfhxcP1qHVLz07TO_VBXq7dnP9mBbQ91/pub?output=csv";
 
-// ---------------------------------------------------------------------------
-// 2) Helpers
-// ---------------------------------------------------------------------------
 const $root = document.getElementById("news-root");
 
+// --------------------------- Utilidades -----------------------------------
+function normalizeKey(s) {
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\s\-_]/g, "");
+}
+
 function toDate(d) {
-  const dt = new Date(d);
-  return isNaN(dt.getTime()) ? null : dt;
+  if (!d) return null;
+  if (typeof d === "number") {
+    const jsDate = new Date(Math.round((d - 25569) * 86400 * 1000));
+    return isNaN(jsDate.getTime()) ? null : jsDate;
+  }
+  const str = String(d).trim();
+  if (!str) return null;
+  const dm = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (dm) {
+    let day = dm[1].padStart(2, "0");
+    let mon = dm[2].padStart(2, "0");
+    let year = dm[3];
+    if (year.length === 2) year = "20" + year;
+    const iso = `${year}-${mon}-${day}`;
+    const dt = new Date(iso);
+    if (!isNaN(dt.getTime())) return dt;
+  }
+  const dt = new Date(str);
+  if (!isNaN(dt.getTime())) return dt;
+  return null;
 }
 
-function monthKey(dt) {
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
-}
-
+function monthKey(dt) { return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`; }
 function monthTitle(dt) {
-  // Ej.: "agosto de 2025" -> capitalizamos primer letra de mes
   const str = dt.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function faviconFrom(url) {
-  try {
-    const u = new URL(url);
-    return `${u.origin}/favicon.ico`;
-  } catch { return null; }
-}
-
-function domainFrom(url) {
-  try { return new URL(url).hostname.replace(/^www\./, ""); }
-  catch { return ""; }
-}
-
-// Crea el DOM de una card
+// --------------------------- Render (mantiene tu diseño) -------------------
 function createCard(item) {
   const a = document.createElement("a");
   a.className = "news-link";
-  a.href = item.url;
+  a.href = item.url || "#";
   a.target = "_blank";
   a.rel = "noopener noreferrer";
 
   const card = document.createElement("article");
   card.className = "news-card";
 
-  // Thumb
   const thumb = document.createElement("div");
   thumb.className = "news-thumb";
 
   if (item.image) {
     const img = document.createElement("img");
     img.src = item.image;
-    img.alt = "";
+    img.alt = item.title || "";
     thumb.appendChild(img);
   } else {
-    // Fallback visual con favicon + dominio
     thumb.classList.add("fallback");
-    const wrap = document.createElement("div");
-    wrap.className = "fallback-wrap";
-
-    const fav = document.createElement("img");
-    fav.className = "site-favicon";
-    const fv = faviconFrom(item.url);
-    if (fv) fav.src = fv;
-    fav.alt = "";
-
-    const dom = document.createElement("div");
-    dom.className = "fallback-domain";
-    dom.textContent = domainFrom(item.url);
-
-    wrap.appendChild(fav);
-    wrap.appendChild(dom);
-    thumb.appendChild(wrap);
+    thumb.textContent = "Sin imagen";
   }
 
-  // Body
   const body = document.createElement("div");
   body.className = "news-body";
 
-  // Meta (fecha corta)
   const meta = document.createElement("div");
   meta.className = "news-meta";
-  const dt = toDate(item.date);
-  if (dt) {
-    const span = document.createElement("span");
-    span.textContent = dt.toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
-    meta.appendChild(span);
-  }
+  const dt = item._date instanceof Date ? item._date : null;
+  const span = document.createElement("span");
+  span.textContent = dt ? dt.toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" }) : "Fecha desconocida";
+  meta.appendChild(span);
 
-  // Título
   const h3 = document.createElement("h3");
   h3.className = "news-title";
-  h3.textContent = item.title || "";
+  h3.textContent = item.title || "(Sin título)";
 
-  // Descripción
   const p = document.createElement("p");
   p.className = "news-desc";
   p.textContent = item.description || "";
 
-  // Tags
-  let tagsWrap = null;
-  if (Array.isArray(item.tags) && item.tags.length) {
-    tagsWrap = document.createElement("div");
-    tagsWrap.className = "news-tags";
-    item.tags.forEach(t => {
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = t;
-      tagsWrap.appendChild(tag);
-    });
-  }
-
   body.appendChild(meta);
   body.appendChild(h3);
   if (p.textContent) body.appendChild(p);
-  if (tagsWrap) body.appendChild(tagsWrap);
 
   card.appendChild(thumb);
   card.appendChild(body);
@@ -165,50 +95,136 @@ function createCard(item) {
   return a;
 }
 
-// ---------------------------------------------------------------------------
-// 3) Agrupar por Mes/Año y renderizar
-// ---------------------------------------------------------------------------
 function renderNews(items) {
   if (!$root) return;
+  const withDates = items.map(it => ({ ...it, _date: toDate(it.date) }));
+  withDates.sort((a, b) => {
+    if (a._date && b._date) return b._date - a._date;
+    if (a._date && !b._date) return -1;
+    if (!a._date && b._date) return 1;
+    return 0;
+  });
 
-  // Sanitizar + ordenar desc por fecha
-  const clean = items
-    .map(it => ({ ...it, _date: toDate(it.date) }))
-    .filter(it => it._date instanceof Date)
-    .sort((a, b) => b._date - a._date);
-
-  // Agrupar
   const groups = new Map();
-  for (const it of clean) {
-    const key = monthKey(it._date);
+  for (const it of withDates) {
+    const key = it._date ? monthKey(it._date) : "unknown";
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(it);
   }
 
-  // Limpiar root
   $root.innerHTML = "";
-
-  // Render por grupo
   for (const [key, arr] of groups) {
-    const dt = arr[0]._date; // cualquiera del grupo sirve para el título
     const section = document.createElement("section");
     section.className = "month-group";
-    section.id = `m-${key}`; // ancla
-
+    section.id = key === "unknown" ? "m-unknown" : `m-${key}`;
     const h2 = document.createElement("h2");
     h2.className = "month-title";
-    h2.textContent = monthTitle(dt); // Ej.: "Agosto de 2025"
-
+    h2.textContent = key === "unknown" ? "Sin fecha" : monthTitle(arr[0]._date);
     const grid = document.createElement("div");
     grid.className = "news-list";
-
     arr.forEach(item => grid.appendChild(createCard(item)));
-
     section.appendChild(h2);
     section.appendChild(grid);
     $root.appendChild(section);
   }
 }
 
-// Inicializar
-renderNews(NEWS);
+// --------------------------- CSV Parsing ----------------------------------
+function parseCSV(text) {
+  const rows = [];
+  let cur = "";
+  let row = [];
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const nxt = text[i + 1];
+    if (ch === '"') {
+      if (inQuotes && nxt === '"') { cur += '"'; i++; } else { inQuotes = !inQuotes; }
+      continue;
+    }
+    if (ch === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
+    if ((ch === "\n" || ch === "\r") && !inQuotes) {
+      if (ch === "\r" && text[i+1] === "\n") { i++; }
+      row.push(cur);
+      rows.push(row);
+      row = [];
+      cur = "";
+      continue;
+    }
+    cur += ch;
+  }
+  if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
+function csvRowsToObjects(rows) {
+  if (!rows || !rows.length) return [];
+  const headers = rows[0].map(h => normalizeKey(String(h || "")));
+  const out = [];
+  for (let r = 1; r < rows.length; r++) {
+    const line = rows[r];
+    if (!line || line.length === 0) continue;
+    const obj = {};
+    for (let c = 0; c < Math.max(headers.length, line.length); c++) {
+      const key = headers[c] || ("col" + c);
+      obj[key] = line[c] !== undefined ? line[c] : "";
+    }
+    out.push(obj);
+  }
+  return out;
+}
+
+// --------------------------- Microlink fetch --------------------------------
+async function fetchLinkData(url){
+  if(!url) return {};
+  try {
+    const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    return {
+      title: data.data.title || "",
+      description: data.data.description || "",
+      image: data.data.image?.url || ""
+    };
+  } catch(e){
+    console.warn("Error fetchLinkData:", e);
+    return {};
+  }
+}
+
+async function mapRowToItemWithMeta(rowObj){
+  const url = rowObj['url'] || rowObj['link'] || rowObj['col0'] || "";
+  if(!url) return null;
+  const meta = await fetchLinkData(url);
+  const date = rowObj['date'] || rowObj['fecha'] || "";
+  return {
+    url,
+    title: meta.title || rowObj['title'] || "(Sin título)",
+    description: meta.description || rowObj['description'] || "",
+    image: meta.image || "",
+    date
+  };
+}
+
+// --------------------------- Load News -----------------------------------
+async function loadNews(){
+  try {
+    const text = await fetch(CSV_URL).then(r=>r.text());
+    const rows = parseCSV(text);
+    const objs = csvRowsToObjects(rows);
+
+    const items = [];
+    for(let i=0; i<objs.length; i++){
+      const item = await mapRowToItemWithMeta(objs[i]);
+      if(item) items.push(item);
+    }
+
+    renderNews(items);
+
+  } catch(e){
+    console.error("Error al cargar novedades:", e);
+    if($root) $root.innerHTML = `<div style="padding:24px; color:var(--TEXTO_SECUNDARIO,#9ca3af)">Error al cargar novedades. Revisa consola.</div>`;
+  }
+}
+
+loadNews();
