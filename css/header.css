@@ -10,6 +10,46 @@
   --backdrop: rgba(0,0,0,.35);   /* backdrop para el menú mobile */
 }
 
+/* --------------------------------------------------
+   Normalización / "reset" específico para el nav
+   Esto garantiza que todos los items del nav (links,
+   botones, y el contenido del mega) compartan la misma
+   tipografía, color y transformaciones, evitando
+   inconsistencias provenientes de otras hojas.
+   -------------------------------------------------- */
+
+.header-row, .site-header, .main-nav { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
+
+/* Forzar consistencia visual en todos los elementos del nav */
+.nav-list a,
+.nav-list button,
+.nav-link,
+button.nav-link,
+.mega-toggle,
+.mega a {
+  color: var(--text-on-header) !important;   /* evita que se ponga negro por estilos externos */
+  text-transform: none !important;           /* respeta el texto tal cual está en HTML */
+  font-weight: 700 !important;               /* uniforma el grosor */
+  font-family: inherit !important;           /* misma fuente para todos */
+  text-decoration: none !important;
+  background: transparent !important;
+  line-height: 1 !important;
+}
+
+/* Si prefieres forzar TODO en minúsculas o mayúsculas,
+   reemplaza "none" por "lowercase" o "uppercase" arriba. */
+
+/* ===== pequeños ajustes para accesibilidad y foco ===== */
+.nav-list a:focus,
+.nav-list button:focus,
+button.nav-link:focus,
+.nav-link:focus,
+.mega a:focus {
+  outline: 2px solid rgba(234,247,251,0.95);
+  outline-offset: 2px;
+}
+
+/* ===== estilos base (se mantiene la mayor parte de tu CSS original) ===== */
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 a { text-decoration: none; }
@@ -136,7 +176,7 @@ button.nav-link:focus-visible,
 }
 .mega a:hover{ background: rgba(255,255,255,.08); }
 
-/* ===== (Si tenías CTA a la derecha) ===== */
+/* ===== BOTÓN CTA ===== */
 .header-cta .btn.btn-cta,
 .nav-cta-mobile .btn.btn-cta{
   background: #ffffff; color: #0c5366; font-weight: 800;
@@ -239,3 +279,10 @@ button.nav-link:focus-visible,
   button.nav-link,
   .mega-toggle{ padding: .95rem .9rem; font-size: 1.02rem; }
 }
+
+/* ===== Opcional: reglas específicas para diferenciar el contenido del mega =====
+   Si quieres que los links dentro del mega tengan un peso / color ligeramente
+   diferente (por ejemplo un tono más claro), puedes modificar sólo esta regla.
+   Por defecto dejamos la normalización global arriba para asegurar consistencia. */
+
+/* .mega a { color: #dcf6ff; font-weight: 600; } */
