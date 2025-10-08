@@ -1,322 +1,354 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Sindicato del Gas: trámites, turnos, beneficios para afiliados, capacitaciones y novedades." />
+  <title>Sindicato del Gas — Slider aislado + Footer sencillo</title>
+  <meta name="description" content="Slider responsive (desktop & móvil) con header preservado y footer simple." />
   <meta name="theme-color" content="#085e75" />
 
-  <!-- 👇 Importante: rutas relativas (NO empezar con "/") -->
-  <link rel="icon" href="./fotos/LOGO STIGAS CABA.png" />
-  <link rel="stylesheet" href="./css/header.css" />
-  <title>Sindicato del Gas — Inicio</title>
-
-  <!-- Paleta global (debe ir antes del <style>) -->
-  <!-- 👇 Importante: ruta relativa -->
-  <script src="./scripts/theme.js"></script>
-
-  <!-- ===== Estilos DEL INDEX (inline) ===== -->
   <style>
+    /* ==========================
+       NB: Todo el CSS del slider y footer está
+       encapsulado bajo la clase raíz `.nb-slider-root`
+       para NO tocar estilos existentes del header.
+       ========================== */
+
     :root{
-      /* Aliases locales que apuntan a la paleta global (con fallback a tus valores actuales) */
-      --brand:    var(--brand-600, #085e75);
-      --brand-2:  var(--brand-500, #0a6e89);
-      --ink:      #0f2230;                 /* fondo oscuro de footer */
-      --text:     var(--fg, #102027);      /* texto base (tema claro) */
-      --bg:       var(--bg, #ffffff);      /* fondo base (tema claro) */
-      --muted:    var(--muted, #5F6368);
-      --border:   var(--border, #E6E6E6);
-      --container: min(1200px, 94vw);
-      --radius:16px;
-      --shadow: 0 16px 40px rgba(0,0,0,.18);
+      --nb-brand: #085e75;
+      --nb-brand-dark: #074b5d;
+      --nb-accent: #0f9d58; /* verde resaltado */
+      --nb-bg: #0f1720;     /* letterbox detrás de las imágenes */
+      --nb-dot: rgba(255,255,255,0.55);
+      --nb-shadow: 0 12px 28px rgba(0,0,0,.18);
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
-    a{color:inherit}
-    img{display:block;max-width:100%}
-    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;padding:0;margin:-1px}
-    .skip-link{position:absolute;left:-9999px;top:auto}
-    .skip-link:focus{left:12px;top:12px;background:#fff;padding:.5rem .75rem;border-radius:8px;box-shadow:var(--shadow);z-index:10000}
 
-    /* ===== HERO SLIDER (70vh) ===== */
-    .hero{
+    /* Basic resets (scoped only via body, safe) */
+    html,body{height:100%; margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:#111;}
+
+    /* ===== Contenedor raíz (evita afectar globalmente) ===== */
+    .nb-slider-root { width:100%; }
+
+    /* = Header: inserta aquí tu header real (NO alteramos sus estilos) =
+       Por seguridad no incluimos reglas para .brand img ni .site-header.
+       Si tu header está cargado con load-header.js, mantenelo. */
+
+    /* ============ Slider principal (aislado) ============ */
+    .nb-slider {
+      width:100%;
+      /* la altura del hero se calculará respecto a 100vh */
+      background: var(--nb-bg);
+    }
+
+    /* Hero ocupa 100vh menos el header visible (no intentamos forzar header) */
+    /* Para mayor compatibilidad, usaremos calc con una variable CSS que podes ajustar si tu header tiene otra altura. */
+    :root { --nb-header-h: 66px; --nb-header-h-sm: 60px; }
+    .nb-hero {
+      width:100%;
+      height: calc(100vh - var(--nb-header-h));
+      min-height:260px;
       position:relative;
-      height:70vh; min-height:380px; width:100%;
-      background:#000; overflow:hidden; isolation:isolate;
+      overflow:hidden;
+      background: var(--nb-bg);
+      display:block;
     }
-    .slides{ position:relative; inset:0; height:100%; }
-    .slide{
-      position:absolute; inset:0;
-      opacity:0; transform:scale(1.02);
-      transition:opacity .6s ease, transform .6s ease;
-      will-change:opacity, transform;
+    @media (max-width:900px){
+      .nb-hero { height: calc(100vh - var(--nb-header-h-sm)); }
     }
-    .slide.is-active{ opacity:1; transform:scale(1); }
-    .slide img{
-      width:100%; height:100%;
-      object-fit:cover; object-position:center;
-      filter:contrast(1.05) saturate(1.02);
-    }
-    /* overlay para legibilidad del texto */
-    .slide::before{
-      content:""; position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.15) 45%, rgba(0,0,0,.0) 70%);
-      pointer-events:none;
-    }
-    /* Texto y CTA */
-    .caption{
-      position:absolute; inset:0; display:grid; align-content:center;
-      padding-inline: clamp(16px, 4vw, 40px);
-    }
-    .cap-inner{
-      width:var(--container); margin-inline:auto; max-width: 900px;
-      color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,.45);
-    }
-    .cap-eyebrow{
-      display:inline-block; margin:0 0 .5rem; padding:.25rem .6rem;
-      background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25);
-      border-radius:999px; font-weight:700; letter-spacing:.3px; font-size:.95rem;
-      backdrop-filter: blur(6px);
-    }
-    .cap-title{
-      margin:.2rem 0 .6rem; font-weight:800; line-height:1.1;
-      font-size: clamp(2rem, 4.5vw, 3.2rem);
-    }
-    .cap-sub{ margin:0 0 1.1rem; font-size: clamp(1rem, 2.1vw, 1.25rem); max-width: 60ch; }
-    .btn-cta{
-      display:inline-block; background: var(--accent-500, #ff8a3d); color:#fff; font-weight:800;
-      padding:.8rem 1.1rem; border-radius:.7rem; text-decoration:none; box-shadow:var(--shadow);
-    }
-    .btn-cta:hover{ filter:brightness(.95); }
 
-    /* Flechas */
-    .control{
-      position:absolute; top:50%; translate:0 -50%;
-      width:46px; height:46px; border-radius:50%;
+    /* Slides generales */
+    .nb-slides { position:relative; width:100%; height:100%; }
+    .nb-slide {
+      position:absolute; inset:0;
       display:grid; place-items:center;
-      background:#fff;
-      border:1px solid var(--border); cursor:pointer; box-shadow:var(--shadow);
-      font-size:24px; line-height:1; color:#000;
+      opacity:0; pointer-events:none;
+      transition: opacity .45s ease;
     }
-    .control:hover{ background:#fff; filter:brightness(0.98); }
-    .control.prev{ left:14px; }
-    .control.next{ right:14px; }
+    .nb-slide.is-active{ opacity:1; pointer-events:auto; z-index:1; }
+
+    .nb-slide > a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
+
+    /* ===== MOSTRAR IMAGEN COMPLETA (no recortar) =====
+       Ajustes para que haya "aire" y no se corte la parte inferior:
+       - max-height sustraerá un espacio (72px por defecto)
+       - en móviles se aumenta ese hueco un poco más
+    */
+    .nb-slide img {
+      width: auto;
+      height: auto;
+      max-width: calc(100% - 16px);
+      max-height: calc(100% - 72px); /* <-- espacio inferior adicional para evitar corte */
+      object-fit: contain;
+      object-position: center;
+      border-radius: 6px;
+      box-shadow: var(--nb-shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      display:block;
+    }
+    @media (max-width:480px){
+      .nb-slide img { max-width: calc(100% - 14px); max-height: calc(100% - 92px); } /* más aire en móviles */
+    }
+
+    /* Controles (prev/next). Ocultos en pantallas pequeñas */
+    .nb-control {
+      position:absolute; top:50%; transform:translateY(-50%);
+      width:44px; height:44px; border-radius:999px; display:grid; place-items:center;
+      background:rgba(255,255,255,0.95); border:1px solid rgba(0,0,0,.06);
+      cursor:pointer; box-shadow:var(--nb-shadow); font-size:22px; z-index:30;
+    }
+    .nb-control.prev { left:12px; }
+    .nb-control.next { right:12px; }
+    @media (max-width:520px){ .nb-control { display:none; } }
 
     /* Dots */
-    .dots{
-      position:absolute; left:50%; bottom:16px; translate:-50% 0;
+    .nb-dots {
+      position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
       display:flex; gap:8px; padding:6px 10px; border-radius:999px;
-      background:rgba(0,0,0,.35); backdrop-filter:blur(6px);
+      background: rgba(0,0,0,0.18); z-index:32; backdrop-filter: blur(6px);
     }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background:rgba(255,255,255,.6);
-      border:0; cursor:pointer;
-    }
-    .dot.is-active{ background:#fff; width:22px; border-radius:999px; transition:width .25s ease; }
+    .nb-dot { width:10px; height:10px; border-radius:50%; background:var(--nb-dot); border:0; cursor:pointer; }
+    .nb-dot.is-active{ width:22px; border-radius:999px; background:#fff; transition:width .22s ease; }
 
-    /* ===== BARRA INFORMATIVA ===== */
-    .info-band{
-      width:100%; background:var(--brand); color:#fff;
-      margin:0; padding:12px 0; font-weight:700; letter-spacing:.2px;
-    }
-    .info-band .inner{
-      width:var(--container); margin-inline:auto; padding:0 6px;
-      display:flex; gap:12px; align-items:center; justify-content:center; text-align:center; flex-wrap:wrap;
-    }
-    .info-band a{ color:#fff; text-decoration:underline; }
+    /* ============ Desktop vs Mobile sets (3 images each) ============ */
+    /* Desktop visible >=900px */
+    .nb-slides-desktop { display:block; }
+    .nb-slides-mobile { display:none; }
 
-    /* Footer base */
-    footer{ background: var(--ink); color:#cfe7ef; margin-top:40px; }
-    .footer-info{ width:var(--container); margin:0 auto; padding:26px 4px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; }
-    .sub-footer-info input{
-      width:280px; max-width:100%; padding:.6rem .8rem; border-radius:8px; border:1px solid #a9c7d1; background:#fff; color:#102027;
+    @media (max-width:900px){
+      .nb-slides-desktop { display:none !important; }
+      .nb-slides-mobile { display:block !important; }
     }
-    .redes{ display:flex; gap:14px; align-items:center; }
-    .redes-a{ color:#fff; text-decoration:none; font-weight:600; }
-    .redes-a:hover{ text-decoration:underline; }
 
-    /* Responsive */
-    @media (max-width: 900px){
-      .control{ width:40px; height:40px; font-size:22px; }
-      .slide::before{ background:linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.2) 60%, rgba(0,0,0,.05) 85%); }
+    /* Nota en verde para indicar sección móvil (según pediste) */
+    .nb-device-note { text-align:center; color:var(--nb-accent); font-weight:700; margin:8px 0 6px 0; }
+
+    /* ============ Footer sencillo y prolijo ============ */
+    .nb-footer {
+      background: #082d36; /* oscuro acorde al brand */
+      color: #eaf7fb;
+      padding:18px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
     }
+    .nb-footer .nb-contact { display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+    .nb-footer a { color: #eaf7fb; text-decoration:none; display:flex; gap:8px; align-items:center; font-weight:600; }
+    .nb-footer svg { width:18px; height:18px; display:block; }
+
+    .nb-footer .nb-brand { display:flex; gap:12px; align-items:center; font-weight:800; }
+    .nb-footer .nb-brand svg { width:28px; height:28px; }
+
+    @media (max-width:600px){
+      .nb-footer { padding:14px 10px; font-size:0.95rem; justify-content:center; text-align:center; }
+      .nb-footer .nb-contact { width:100%; justify-content:center; }
+    }
+
+    /* accessibility focus for anchor */
+    .nb-slide a:focus, .nb-footer a:focus { outline: 3px solid rgba(15,93,117,0.95); outline-offset: 3px; border-radius:6px; }
   </style>
 </head>
-
 <body>
-  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <!-- ======= TU HEADER (NO MODIFICAR) =======
+       Pega aquí el header tal como lo tengas en tu proyecto.
+       Ejemplo mínimo (puedes dejar el load-header.js si lo usas):
+  -->
 
-  <!-- Header reutilizable -->
   <div id="header-placeholder"></div>
+  <script src="../scripts/load-header.js"></script>
 
-  <main id="main" role="main">
-    <!-- ===== SLIDER ===== -->
-    <section class="hero" aria-label="Campañas destacadas">
-      <div class="slides" data-slides>
-        <!-- 1 -->
-        <figure class="slide is-active">
-          <img src="https://images.unsplash.com/photo-1568968002134-8f4d1e717f2a?q=80&w=1920&auto=format&fit=crop" alt="Equipo en planta de gas" />
-          <figcaption class="caption">
-            <div class="cap-inner">
-              <span class="cap-eyebrow">Institucional</span>
-              <h2 class="cap-title">Un Sindicato del Gas más cerca de los trabajadores</h2>
-              <p class="cap-sub">Representación, diálogo y transparencia para defender tus derechos y mejorar tus condiciones laborales.</p>
-              <!-- 👇 Ruta relativa (el JS también cubrirá las absolutas si hubiera) -->
-              <a class="btn-cta" href="./pages/historia.html">Conocé más</a>
-            </div>
-          </figcaption>
-        </figure>
+  <!-- ============ AQUI EMPIEZA nuestro slider aislado ============ -->
+  <div class="nb-slider-root">
+    <section class="nb-slider" aria-label="Slider principal">
+      <div class="nb-hero">
+        <!-- ===== Desktop: 3 imágenes (reemplazá las rutas) ===== -->
+        <div class="nb-slides nb-slides-desktop" data-nb-slides="desktop">
+          <figure class="nb-slide is-active">
+            <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia">
+              <img src="./fotos/Banner1.jpeg" alt="Banner 1 desktop" loading="lazy" />
+            </a>
+          </figure>
+          <figure class="nb-slide" aria-hidden="true">
+            <a href="./pages/industria.html" aria-label="Ir a Industria">
+              <img src="./fotos/Banner2.jpeg" alt="Banner 2 desktop" loading="lazy" />
+            </a>
+          </figure>
+          <figure class="nb-slide" aria-hidden="true">
+            <a href="./pages/novedades.html" aria-label="Ir a Novedades">
+              <img src="./fotos/Banner3.jpeg" alt="Banner 3 desktop" loading="lazy" />
+            </a>
+          </figure>
 
-        <!-- 2 -->
-        <figure class="slide">
-          <img src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?q=80&w=1920&auto=format&fit=crop" alt="Inspector realizando control técnico" />
-          <figcaption class="caption">
-            <div class="cap-inner">
-              <span class="cap-eyebrow">Servicios</span>
-              <h2 class="cap-title">Trámites y turnos 100% online</h2>
-              <p class="cap-sub">Solicitá turnos para inspecciones, homologaciones y certificaciones de manera rápida y segura.</p>
-              <a class="btn-cta" href="./pages/contactanos.html">Sacá turno</a>
-            </div>
-          </figcaption>
-        </figure>
+          <button class="nb-control prev" aria-label="Anterior" data-nb-prev="desktop">‹</button>
+          <button class="nb-control next" aria-label="Siguiente" data-nb-next="desktop">›</button>
+          <div class="nb-dots" data-nb-dots="desktop" role="tablist" aria-label="Paginación desktop"></div>
+        </div>
 
-        <!-- 3 -->
-        <figure class="slide">
-          <img src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=1920&auto=format&fit=crop" alt="Trabajadores con EPP en operación de válvulas" />
-          <figcaption class="caption">
-            <div class="cap-inner">
-              <span class="cap-eyebrow">Beneficios</span>
-              <h2 class="cap-title">Beneficios y asesoramiento para afiliados</h2>
-              <p class="cap-sub">Accedé a convenios, asesoría legal y programas de bienestar para vos y tu familia.</p>
-              <a class="btn-cta" href="./pages/novedades.html">Ver beneficios</a>
-            </div>
-          </figcaption>
-        </figure>
+        <!-- Nota verde indicando la sección móvil -->
+        <div class="nb-device-note" aria-hidden="true">IMÁGENES PARA CELULAR</div>
 
-        <!-- 4 -->
-        <figure class="slide">
-          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop" alt="Capacitación en seguridad industrial" />
-          <figcaption class="caption">
-            <div class="cap-inner">
-              <span class="cap-eyebrow">Capacitaciones</span>
-              <h2 class="cap-title">Seguridad y formación continua</h2>
-              <p class="cap-sub">Cursos, jornadas y material técnico para elevar el estándar de seguridad en cada tarea.</p>
-              <a class="btn-cta" href="./pages/novedades.html">Próximas fechas</a>
-            </div>
-          </figcaption>
-        </figure>
+        <!-- ===== Mobile: 3 imágenes (reemplazá las rutas) ===== -->
+        <div class="nb-slides nb-slides-mobile" data-nb-slides="mobile">
+          <figure class="nb-slide is-active">
+            <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia (móvil)">
+              <img src="./fotos/Banner1-mobile.jpg" alt="Banner 1 móvil" loading="lazy" />
+            </a>
+          </figure>
+          <figure class="nb-slide" aria-hidden="true">
+            <a href="./pages/industria.html" aria-label="Ir a Industria (móvil)">
+              <img src="./fotos/Banner2-mobile.jpg" alt="Banner 2 móvil" loading="lazy" />
+            </a>
+          </figure>
+          <figure class="nb-slide" aria-hidden="true">
+            <a href="./pages/novedades.html" aria-label="Ir a Novedades (móvil)">
+              <img src="./fotos/Banner3-mobile.jpg" alt="Banner 3 móvil" loading="lazy" />
+            </a>
+          </figure>
 
-        <!-- 5 -->
-        <figure class="slide">
-          <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1920&auto=format&fit=crop" alt="Atención al público y delegaciones" />
-          <figcaption class="caption">
-            <div class="cap-inner">
-              <span class="cap-eyebrow">Contacto</span>
-              <h2 class="cap-title">Delegaciones y canales de atención</h2>
-              <p class="cap-sub">Encontrá tu delegación más cercana o escribinos para consultas y reclamos.</p>
-              <a class="btn-cta" href="./pages/contactanos.html">Ver contactos</a>
-            </div>
-          </figcaption>
-        </figure>
-      </div>
-
-      <button class="control prev" aria-label="Imagen anterior" data-prev>‹</button>
-      <button class="control next" aria-label="Imagen siguiente" data-next>›</button>
-      <div class="dots" role="tablist" aria-label="Selector de imagen" data-dots></div>
-    </section>
-
-    <!-- ===== BARRA INFORMATIVA ===== -->
-    <section class="info-band" aria-label="Información importante">
-      <div class="inner">
-        <span>📢</span>
-        <span>Paritarias 2025: acta acuerdo y escalas actualizadas disponibles.</span>
-        <a href="./pages/novedades.html">Ver documentación</a>
+          <button class="nb-control prev" aria-label="Anterior" data-nb-prev="mobile">‹</button>
+          <button class="nb-control next" aria-label="Siguiente" data-nb-next="mobile">›</button>
+          <div class="nb-dots" data-nb-dots="mobile" role="tablist" aria-label="Paginación móvil"></div>
+        </div>
       </div>
     </section>
-  </main>
 
-  <!-- Footer mínimo (opcional) -->
-  <footer role="contentinfo">
-    <div class="footer-info">
-      <div class="sub-footer-info">
-        <p>
-          (+54 11) 9999-9999 <br />
-          contacto@sindicatodelgas.org <br />
-          Av. Ejemplo 1234 — CABA
-        </p>
-        <label for="suscribite" class="sr-only">Suscribite a novedades</label>
-        <input id="suscribite" type="email" placeholder="Escribí tu mail" inputmode="email" />
+    <!-- ============ Footer sencillo ============ -->
+    <footer class="nb-footer" role="contentinfo" aria-label="Pie de página">
+      <div class="nb-brand">
+        <!-- pequeño logo (inline SVG) -->
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <rect width="24" height="24" rx="5" fill="#eaf7fb"/>
+          <path d="M6 12h12M6 8h12M6 16h12" stroke="#085e75" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          Sindicato del Gas
+        </div>
       </div>
 
-      <div class="redes" aria-label="Redes sociales">
-        <a class="redes-a" href="#" target="_blank" rel="noopener">Instagram</a>
-        <a class="redes-a" href="#" target="_blank" rel="noopener">Facebook</a>
-        <a class="redes-a" href="#" target="_blank" rel="noopener">X</a>
+      <div class="nb-contact" aria-label="Contacto">
+        <a href="tel:+541199999999" aria-label="Teléfono">
+          <!-- icono teléfono -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.12 1.05.42 2.07.9 3.02a2 2 0 0 1-.45 2.11L8.91 11.09a16 16 0 0 0 6 6l1.24-1.24a2 2 0 0 1 2.11-.45c.95.48 1.97.78 3.02.9A2 2 0 0 1 22 16.92z" stroke="#eaf7fb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          (+54 11) 9999-9999
+        </a>
+
+        <a href="mailto:contacto@sindicatodelgas.org" aria-label="Correo">
+          <!-- icono mail -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 8.5l9 6 9-6" stroke="#eaf7fb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="4" width="20" height="16" rx="2" stroke="#eaf7fb" stroke-width="1.2"/></svg>
+          contacto@sindicatodelgas.org
+        </a>
+
+        <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
+          <!-- icono Instagram -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#eaf7fb" stroke-width="1.2"/><path d="M8 11.5a3.5 3.5 0 1 0 7 0 3.5 3.5 0 0 0-7 0z" stroke="#eaf7fb" stroke-width="1.2"/><path d="M17.5 6.5h.01" stroke="#eaf7fb" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Instagram
+        </a>
+
+        <a href="https://x.com" target="_blank" rel="noopener" aria-label="X (Twitter)">
+          <!-- icono X / Twitter simplified -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 12.5 8v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" stroke="#eaf7fb" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          X
+        </a>
       </div>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
-  <!-- Carga del header -->
-  <script defer src="./scripts/load-header.js"></script>
-
-  <!-- ===== JS del slider ===== -->
+  <!-- ============ JS: slider init (aislado) ============ -->
   <script>
-    (function(){
-      const $slides = Array.from(document.querySelectorAll('.slide'));
-      const $dotsWrap = document.querySelector('[data-dots]');
-      const $prev = document.querySelector('[data-prev]');
-      const $next = document.querySelector('[data-next]');
-      let i = 0, timer = null, AUTOPLAY_MS = 5500, isHover = false;
+    (function () {
+      // Inicializa un slider aislado en el container pasado.
+      function initNbSlider(container, opts = {}) {
+        const root = container;
+        const slides = Array.from(root.querySelectorAll('.nb-slide'));
+        const prev = root.querySelector('[data-nb-prev="' + (opts.key || '') + '"]') || root.querySelector('[data-nb-prev]');
+        const next = root.querySelector('[data-nb-next="' + (opts.key || '') + '"]') || root.querySelector('[data-nb-next]');
+        const dotsContainer = root.querySelector('[data-nb-dots="' + (opts.key || '') + '"]') || root.querySelector('.nb-dots');
 
-      // Crear dots
-      $slides.forEach((_, idx) => {
-        const b = document.createElement('button');
-        b.className = 'dot' + (idx === 0 ? ' is-active' : '');
-        b.setAttribute('aria-label', 'Ir a imagen ' + (idx + 1));
-        b.addEventListener('click', () => go(idx, true));
-        $dotsWrap.appendChild(b);
-      });
-      const $dots = Array.from($dotsWrap.children);
+        // Build dots
+        slides.forEach((_, i) => {
+          const b = document.createElement('button');
+          b.className = 'nb-dot' + (i === 0 ? ' is-active' : '');
+          b.type = 'button';
+          b.setAttribute('aria-label', 'Ir a imagen ' + (i + 1));
+          b.addEventListener('click', () => go(i, true));
+          dotsContainer.appendChild(b);
+        });
+        const dots = Array.from(dotsContainer.children);
 
-      function go(n, user=false){
-        $slides[i].classList.remove('is-active');
-        $dots[i].classList.remove('is-active');
-        i = (n + $slides.length) % $slides.length;
-        $slides[i].classList.add('is-active');
-        $dots[i].classList.add('is-active');
-        if (user) restart();
+        let idx = 0;
+        const AUTOPLAY = opts.autoplay || 5000;
+        let timer = null;
+        let isHover = false;
+
+        function show(n) {
+          slides.forEach((s, i) => {
+            const active = i === n;
+            s.classList.toggle('is-active', active);
+            s.setAttribute('aria-hidden', !active);
+            if (dots[i]) dots[i].classList.toggle('is-active', active);
+          });
+        }
+        function go(n, user=false) {
+          idx = (n + slides.length) % slides.length;
+          show(idx);
+          if (user) restart();
+        }
+        function nextFn(){ go(idx + 1); }
+        function prevFn(){ go(idx - 1); }
+
+        prev && prev.addEventListener('click', prevFn);
+        next && next.addEventListener('click', nextFn);
+
+        function start(){ stop(); timer = setInterval(() => { if(!isHover) nextFn(); }, AUTOPLAY); }
+        function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+        function restart(){ start(); }
+
+        // Pause on hover/touch
+        root.addEventListener('mouseenter', () => { isHover = true; });
+        root.addEventListener('mouseleave', () => { isHover = false; });
+        root.addEventListener('touchstart', () => { isHover = true; }, {passive:true});
+        root.addEventListener('touchend', () => { isHover = false; }, {passive:true});
+
+        // swipe support
+        (function addSwipe(){
+          let startX = 0, endX = 0;
+          root.addEventListener('touchstart', (e) => { startX = e.changedTouches[0].clientX; }, {passive:true});
+          root.addEventListener('touchmove', (e) => { endX = e.changedTouches[0].clientX; }, {passive:true});
+          root.addEventListener('touchend', () => {
+            const diff = endX - startX;
+            if (Math.abs(diff) > 40) {
+              if (diff < 0) nextFn(); else prevFn();
+            }
+            startX = endX = 0;
+          }, {passive:true});
+        })();
+
+        // keyboard navigation only when visible
+        document.addEventListener('keydown', (e) => {
+          const style = window.getComputedStyle(root);
+          if (style.display === 'none') return;
+          if (e.key === 'ArrowRight') nextFn();
+          if (e.key === 'ArrowLeft') prevFn();
+        });
+
+        show(0);
+        start();
+
+        return { go, start, stop };
       }
-      function next(){ go(i + 1); }
-      function prev(){ go(i - 1); }
 
-      function start(){ stop(); timer = setInterval(() => { if(!isHover) next(); }, AUTOPLAY_MS); }
-      function stop(){ if (timer) clearInterval(timer); }
-      function restart(){ start(); }
+      // Init desktop slider (if present)
+      const desktopContainer = document.querySelector('.nb-slides-desktop');
+      if (desktopContainer) initNbSlider(desktopContainer, { key: 'desktop', autoplay: 5000 });
 
-      $next.addEventListener('click', next);
-      $prev.addEventListener('click', prev);
+      // Init mobile slider (if present)
+      const mobileContainer = document.querySelector('.nb-slides-mobile');
+      if (mobileContainer) initNbSlider(mobileContainer, { key: 'mobile', autoplay: 4500 });
 
-      // Pausa al pasar mouse/touch
-      const hero = document.querySelector('.hero');
-      hero.addEventListener('mouseenter', () => { isHover = true; });
-      hero.addEventListener('mouseleave', () => { isHover = false; });
-      hero.addEventListener('touchstart', () => { isHover = true; }, {passive:true});
-      hero.addEventListener('touchend', () => { isHover = false; }, {passive:true});
-
-      // Teclado
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') next();
-        if (e.key === 'ArrowLeft') prev();
-      });
-
-      start();
+      // Simple: if you want to adjust header height variable at runtime:
+      // document.documentElement.style.setProperty('--nb-header-h', '66px');
     })();
-  </script>
-
-  <!-- Esta página en particular: modo CLARO -->
-  <script>
-    Theme.applyLight();
   </script>
 </body>
 </html>
