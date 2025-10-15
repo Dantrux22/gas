@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sindicato del Gas — Slider aislado + Footer sencillo</title>
-  <meta name="description" content="Slider responsive (desktop & móvil) con header preservado y footer simple." />
+  <title>Sindicato del Gas — Slider aislado + Footer mejorado</title>
+  <meta name="description" content="Slider responsive (desktop & móvil) con header preservado y footer mejorado." />
   <meta name="theme-color" content="#085e75" />
 
   <style>
@@ -21,6 +21,11 @@
       --nb-bg: #0f1720;     /* letterbox detrás de las imágenes */
       --nb-dot: rgba(255,255,255,0.55);
       --nb-shadow: 0 12px 28px rgba(0,0,0,.18);
+      --nb-header-h: 66px;
+      --nb-header-h-sm: 60px;
+      --nb-spam-bg: #eaf7f5; /* nuevo: spam claro para diferenciar */
+      --nb-spam-text: #053437;
+      --nb-separator: rgba(0,0,0,0.06);
     }
 
     /* Basic resets (scoped only via body, safe) */
@@ -29,20 +34,9 @@
     /* ===== Contenedor raíz (evita afectar globalmente) ===== */
     .nb-slider-root { width:100%; }
 
-    /* = Header: inserta aquí tu header real (NO alteramos sus estilos) =
-       Por seguridad no incluimos reglas para .brand img ni .site-header.
-       Si tu header está cargado con load-header.js, mantenelo. */
-
     /* ============ Slider principal (aislado) ============ */
-    .nb-slider {
-      width:100%;
-      /* la altura del hero se calculará respecto a 100vh */
-      background: var(--nb-bg);
-    }
+    .nb-slider { width:100%; background: var(--nb-bg); }
 
-    /* Hero ocupa 100vh menos el header visible (no intentamos forzar header) */
-    /* Para mayor compatibilidad, usaremos calc con una variable CSS que podes ajustar si tu header tiene otra altura. */
-    :root { --nb-header-h: 66px; --nb-header-h-sm: 60px; }
     .nb-hero {
       width:100%;
       height: calc(100vh - var(--nb-header-h));
@@ -52,9 +46,6 @@
       background: var(--nb-bg);
       display:block;
     }
-    /* @media (max-width:900px){
-      .nb-hero { height: calc(100vh - var(--nb-header-h-sm)); }
-    } */
 
     /* Slides generales */
     .nb-slides { position:relative; width:100%; height:100%; }
@@ -63,30 +54,27 @@
       display:grid; place-items:center;
       opacity:0; pointer-events:none;
       transition: opacity .45s ease;
+      padding: 12px; /* margen interior para "aire" */
     }
     .nb-slide.is-active{ opacity:1; pointer-events:auto; z-index:1; }
 
-    .nb-slide > a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
+    .nb-slide > a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; text-decoration:none; }
 
-    /* ===== MOSTRAR IMAGEN COMPLETA (no recortar) =====
-       Ajustes para que haya "aire" y no se corte la parte inferior:
-       - max-height sustraerá un espacio (72px por defecto)
-       - en móviles se aumenta ese hueco un poco más
-    */
+    /* Imagen: se muestra completa, sin distorsión, centrada */
+    .nb-slide picture,
+    .nb-slide img { display:block; width: 100%; height: 100%; }
     .nb-slide img {
-      width: auto;
-      height: auto;
-      max-width: calc(100% - 16px);
-      max-height: calc(100% - 72px); /* <-- espacio inferior adicional para evitar corte */
       object-fit: contain;
       object-position: center;
+      max-width: 100%;
+      max-height: calc(100% - 72px); /* espacio inferior para evitar cortes */
       border-radius: 6px;
       box-shadow: var(--nb-shadow);
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-      display:block;
     }
     @media (max-width:480px){
-      .nb-slide img { max-width: calc(100% - 14px); max-height: calc(100% - 92px); } /* más aire en móviles */
+      .nb-hero { height: calc(100vh - var(--nb-header-h-sm)); }
+      .nb-slide img { max-height: calc(100% - 92px); } /* más aire en móviles */
     }
 
     /* Controles (prev/next). Ocultos en pantallas pequeñas */
@@ -109,10 +97,9 @@
     .nb-dot { width:10px; height:10px; border-radius:50%; background:var(--nb-dot); border:0; cursor:pointer; }
     .nb-dot.is-active{ width:22px; border-radius:999px; background:#fff; transition:width .22s ease; }
 
-    /* ============ Desktop vs Mobile sets (3 images each) ============ */
-    /* Desktop visible >=900px */
-    .nb-slides-desktop { display:block; }
-    .nb-slides-mobile { display:none; }
+    /* ============ Desktop vs Mobile sets (3 images cada uno) ============ */
+    .nb-slides-desktop { display:block; height:100%; }
+    .nb-slides-mobile { display:none; height:100%; }
 
     @media (max-width:900px){
       .nb-slides-desktop { display:none !important; }
@@ -122,60 +109,144 @@
     /* Nota en verde para indicar sección móvil (según pediste) */
     .nb-device-note { text-align:center; color:var(--nb-accent); font-weight:700; margin:8px 0 6px 0; }
 
-    /* ============ Footer sencillo y prolijo ============ */
-    .nb-footer {
-      background: #082d36; /* oscuro acorde al brand */
-      color: #eaf7fb;
-      padding:18px 12px;
+
+    /* ===== Promo / spam: ahora claramente separado del footer =====
+       - fondo más claro para contrastar con footer oscuro
+       - spacing y borde inferior para separación
+    */
+    .nb-spam--full {
+      width:100%;
+      background: var(--nb-spam-bg);
+      box-shadow: 0 6px 22px rgba(0,0,0,0.06);
+      border-top: 1px solid rgba(10,80,75,0.04);
+      margin-bottom:18px; /* espacio que separa del footer */
+      padding:10px 0; /* espacio vertical para que respire */
+    }
+    .nb-spam {
+      max-width:1200px;
+      margin:0 auto;
+      padding:14px 20px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      flex-wrap:wrap;
+      color:var(--nb-spam-text);
+      border-radius:10px;
+      transform:translateY(0);
     }
-    .nb-footer .nb-contact { display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
-    .nb-footer a { color: #eaf7fb; text-decoration:none; display:flex; gap:8px; align-items:center; font-weight:600; }
-    .nb-footer svg { width:18px; height:18px; display:block; }
+    .nb-spam .nb-spam-text { font-weight:800; font-size:1.05rem; letter-spacing:0.2px; color:var(--nb-spam-text); }
+    .nb-spam .nb-spam-cta { display:flex; gap:10px; align-items:center; }
+    .nb-spam .nb-btn {
+      background: var(--nb-brand); color:#fff; padding:8px 14px; border-radius:999px; font-weight:800; text-decoration:none;
+      box-shadow: 0 8px 22px rgba(10,60,65,0.10);
+      border: 0;
+    }
+    .nb-spam .nb-btn.secondary {
+      background:transparent; border:1px solid rgba(5,52,47,0.08); color:var(--nb-brand-dark); padding:8px 12px; border-radius:8px; font-weight:700;
+    }
+    @media (max-width:720px){
+      .nb-spam { flex-direction:column; text-align:center; padding:12px; border-radius:8px; }
+      .nb-spam .nb-spam-text { font-size:1rem; }
+    }
 
-    .nb-footer .nb-brand { display:flex; gap:12px; align-items:center; font-weight:800; }
-    .nb-footer .nb-brand svg { width:28px; height:28px; }
+    /* pequeño separador visual (entre spam y footer) */
+    .nb-spam-separator {
+      height:8px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.06));
+      width:100%;
+    }
 
-    @media (max-width:600px){
-      .nb-footer { padding:14px 10px; font-size:0.95rem; justify-content:center; text-align:center; }
-      .nb-footer .nb-contact { width:100%; justify-content:center; }
+    /* ============ Footer mejorado ============ */
+    .nb-footer {
+      background: linear-gradient(180deg, #042028 0%, #061f24 100%);
+      color: #eaf7fb;
+      padding:36px 18px;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.45);
+      border-top: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .nb-footer-inner {
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr 1fr 300px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .nb-footer .nb-brand { display:flex; gap:12px; align-items:center; font-weight:900; font-size:1.05rem; }
+    .nb-footer .nb-brand svg { width:38px; height:38px; }
+
+    .nb-footer .nb-contact { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+    .nb-footer a { color: #eaf7fb; text-decoration:none; display:flex; gap:8px; align-items:center; font-weight:700; opacity:0.95; }
+    .nb-footer a:hover { opacity:1; transform:translateY(-2px); }
+
+    .nb-footer .nb-address { font-weight:700; opacity:0.95; }
+
+    .nb-social { display:flex; gap:12px; align-items:center; justify-content:flex-end; }
+    .nb-social a { min-width:88px; padding:8px 10px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.02); font-weight:800; }
+    .nb-social a:hover { background: rgba(234,247,251,0.06); transform:translateY(-2px); }
+
+    .nb-footer .nb-copy { text-align:right; font-size:0.9rem; opacity:0.85; }
+
+    @media (max-width:900px){
+      .nb-footer-inner { grid-template-columns: 1fr; text-align:center; }
+      .nb-footer .nb-copy { text-align:center; margin-top:8px; }
+      .nb-footer .nb-brand { justify-content:center; }
+      .nb-footer .nb-contact { justify-content:center; }
+      .nb-social { justify-content:center; }
+      .nb-footer .nb-copy { order: 3; }
     }
 
     /* accessibility focus for anchor */
-    .nb-slide a:focus, .nb-footer a:focus { outline: 3px solid rgba(15,93,117,0.95); outline-offset: 3px; border-radius:6px; }
+    .nb-slide a:focus, .nb-footer a:focus, .nb-spam .nb-btn:focus { outline: 3px solid rgba(15,93,117,0.95); outline-offset: 3px; border-radius:6px; }
+
   </style>
 </head>
 <body>
-  <!-- ======= TU HEADER (NO MODIFICAR) =======
-       Pega aquí el header tal como lo tengas en tu proyecto.
-       Ejemplo mínimo (puedes dejar el load-header.js si lo usas):
-  -->
+  <!-- ======= TU HEADER (NO MODIFICAR) ======= -->
   <div id="header-placeholder"></div>
   <script src="scripts/load-header.js"></script>
 
   <!-- ============ AQUI EMPIEZA nuestro slider aislado ============ -->
   <div class="nb-slider-root">
     <section class="nb-slider" aria-label="Slider principal">
-      <div class="nb-hero">
-        <!-- ===== Desktop: 3 imágenes (reemplazá las rutas) ===== -->
+      <div class="nb-hero" role="region" aria-label="Hero principal">
+
+        <!-- ===== Desktop: 3 imágenes (reemplazá las rutas si querés versiones para móvil) ===== -->
         <div class="nb-slides nb-slides-desktop" data-nb-slides="desktop">
           <figure class="nb-slide is-active">
             <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia">
-              <img src="./fotos/Banner1.jpeg" alt="Banner 1 desktop" loading="lazy" />
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner1-mobile.jpeg">
+                <img src="./fotos/Banner1.jpeg" alt="Banner 1 desktop" loading="lazy" />
+              </picture>
             </a>
           </figure>
+
           <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/industria.html" aria-label="Ir a Industria">
-              <img src="./fotos/Banner2.jpeg" alt="Banner 2 desktop" loading="lazy" />
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner2-mobile.jpeg">
+                <img src="./fotos/Banner2.jpeg" alt="Banner 2 desktop" loading="lazy" />
+              </picture>
             </a>
           </figure>
+
           <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/novedades.html" aria-label="Ir a Novedades">
-              <img src="./fotos/Banner3.jpeg" alt="Banner 3 desktop" loading="lazy" />
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
+                <img src="./fotos/Banner3.jpeg" alt="Banner 3 desktop" loading="lazy" />
+              </picture>
+            </a>
+          </figure>
+                    <figure class="nb-slide" aria-hidden="true">
+            <a href="./pages/novedades.html" aria-label="Ir a Novedades">
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
+                <img src="./fotos/celular1.jpeg" alt="Banner 3 desktop" loading="lazy" />
+              </picture>
             </a>
           </figure>
 
@@ -185,23 +256,42 @@
         </div>
 
         <!-- Nota verde indicando la sección móvil -->
-        <div class="nb-device-note" aria-hidden="true">IMÁGENES PARA CELULAR</div>
+        <!-- <div class="nb-device-note" aria-hidden="true">IMÁGENES PARA CELULAR</div> -->
 
-        <!-- ===== Mobile: 3 imágenes (reemplazá las rutas) ===== -->
+        <!-- ===== Mobile: 3 imágenes (pueden apuntar a mismas rutas o a versiones mobile) ===== -->
         <div class="nb-slides nb-slides-mobile" data-nb-slides="mobile">
           <figure class="nb-slide is-active">
             <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia (móvil)">
-              <img src="./fotos/Banner1.jpeg" alt="Banner 1 móvil" loading="lazy" />
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner1-mobile.jpeg">
+                <img src="./fotos/celular2.jpeg" alt="Banner 1 móvil" loading="lazy" />
+              </picture>
             </a>
           </figure>
+
           <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/industria.html" aria-label="Ir a Industria (móvil)">
-              <img src="./fotos/Banner2.jpeg" alt="Banner 2 móvil" loading="lazy" />
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner2-mobile.jpeg">
+                <img src="./fotos/Banner2.jpeg" alt="Banner 2 móvil" loading="lazy" />
+              </picture>
             </a>
           </figure>
+
           <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/novedades.html" aria-label="Ir a Novedades (móvil)">
-              <img src="./fotos/Banner3.jpeg" alt="Banner 3 móvil" loading="lazy" />
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
+                <img src="./fotos/celular3.jpeg" alt="Banner 3 móvil" loading="lazy" />
+              </picture>
+            </a>
+          </figure>
+                    <figure class="nb-slide" aria-hidden="true">
+            <a href="./pages/novedades.html" aria-label="Ir a Novedades (móvil)">
+              <picture>
+                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
+                <img src="./fotos/celular4.jpeg" alt="Banner 3 móvil" loading="lazy" />
+              </picture>
             </a>
           </figure>
 
@@ -210,45 +300,54 @@
           <div class="nb-dots" data-nb-dots="mobile" role="tablist" aria-label="Paginación móvil"></div>
         </div>
       </div>
-    </section>
 
-    <!-- ============ Footer sencillo ============ -->
-    <footer class="nb-footer" role="contentinfo" aria-label="Pie de página">
-      <div class="nb-brand">
-        <!-- pequeño logo (inline SVG) -->
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-          <rect width="24" height="24" rx="5" fill="#eaf7fb"/>
-          <path d="M6 12h12M6 8h12M6 16h12" stroke="#085e75" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
-        <div>
-          Sindicato del Gas
+      <!-- ===== Promo / "spam" full-width ===== -->
+      <div class="nb-spam--full" aria-hidden="false">
+        <div class="nb-spam" role="region" aria-label="Novedad destacada">
+          <div class="nb-spam-text">Paritarias2025 — Actualizaciones y novedades del sector del gas.</div>
+          <div class="nb-spam-cta">
+            <a class="nb-btn" href="./pages/novedades.html" aria-label="Ver más sobre Paritarias2025">Ver más</a>
+            <a class="nb-btn secondary" href="./pages/novedades.html#detalle" aria-label="Detalle">Detalle</a>
+          </div>
         </div>
       </div>
 
-      <div class="nb-contact" aria-label="Contacto">
-        <a href="tel:+541199999999" aria-label="Teléfono">
-          <!-- icono teléfono -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.12 1.05.42 2.07.9 3.02a2 2 0 0 1-.45 2.11L8.91 11.09a16 16 0 0 0 6 6l1.24-1.24a2 2 0 0 1 2.11-.45c.95.48 1.97.78 3.02.9A2 2 0 0 1 22 16.92z" stroke="#eaf7fb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          (+54 11) 9999-9999
-        </a>
+      <!-- separador visual entre spam y footer -->
+      <div class="nb-spam-separator" aria-hidden="true"></div>
 
-        <a href="mailto:contacto@sindicatodelgas.org" aria-label="Correo">
-          <!-- icono mail -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 8.5l9 6 9-6" stroke="#eaf7fb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="4" width="20" height="16" rx="2" stroke="#eaf7fb" stroke-width="1.2"/></svg>
-          contacto@sindicatodelgas.org
-        </a>
+    </section>
 
-        <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
-          <!-- icono Instagram -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#eaf7fb" stroke-width="1.2"/><path d="M8 11.5a3.5 3.5 0 1 0 7 0 3.5 3.5 0 0 0-7 0z" stroke="#eaf7fb" stroke-width="1.2"/><path d="M17.5 6.5h.01" stroke="#eaf7fb" stroke-width="1.6" stroke-linecap="round"/></svg>
-          Instagram
-        </a>
+    <!-- ============ Footer mejorado ============ -->
+    <footer class="nb-footer" role="contentinfo" aria-label="Pie de página">
+      <div class="nb-footer-inner">
 
-        <a href="https://x.com" target="_blank" rel="noopener" aria-label="X (Twitter)">
-          <!-- icono X / Twitter simplified -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 12.5 8v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" stroke="#eaf7fb" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          X
-        </a>
+        <div class="nb-brand">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" role="img">
+            <rect width="24" height="24" rx="5" fill="#eaf7fb"/>
+            <path d="M6 12h12M6 8h12M6 16h12" stroke="#085e75" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <div>
+            Sindicato del Gas<br><small style="opacity:.85; font-weight:700;">Organización y Trabajo</small>
+          </div>
+        </div>
+
+        <div>
+          <div class="nb-contact">
+            <div class="nb-address">BOEDO 90 — CAPITAL FEDERAL</div>
+          </div>
+          <div style="margin-top:8px; opacity:0.95;">
+            <a href="mailto:stigasredes@gmail.com" aria-label="Enviar mail">stigasredes@gmail.com</a>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+          <div class="nb-social" aria-label="Redes sociales">
+            <a href="https://instagram.com/STIGAS_BA" target="_blank" rel="noopener" aria-label="Instagram">@STIGAS_BA</a>
+            <a href="https://x.com/STIGAS_BA" target="_blank" rel="noopener" aria-label="X (Twitter)">@STIGAS_BA</a>
+          </div>
+          <div class="nb-copy">&copy; <span id="nb-year"></span> Sindicato del Gas — Todos los derechos reservados</div>
+        </div>
+
       </div>
     </footer>
   </div>
@@ -345,8 +444,9 @@
       const mobileContainer = document.querySelector('.nb-slides-mobile');
       if (mobileContainer) initNbSlider(mobileContainer, { key: 'mobile', autoplay: 4500 });
 
-      // Simple: if you want to adjust header height variable at runtime:
-      // document.documentElement.style.setProperty('--nb-header-h', '66px');
+      // año dinámico en el footer
+      document.getElementById('nb-year').textContent = new Date().getFullYear();
+
     })();
   </script>
 </body>
