@@ -1,470 +1,212 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sindicato del Gas — Slider aislado + Footer mejorado</title>
-  <meta name="description" content="Slider responsive (desktop & móvil) con header preservado y footer mejorado." />
-  <meta name="theme-color" content="#085e75" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sindicato del Gas — Slider responsive + Footer moderno</title>
+<meta name="description" content="Slider responsive con ajuste automático de altura y footer moderno con redes y contacto." />
 
-  <style>
-    /* ==========================
-       NB: Todo el CSS del slider y footer está
-       encapsulado bajo la clase raíz `.nb-slider-root`
-       para NO tocar estilos existentes del header.
-       ========================== */
+<style>
+:root{
+  --brand:#085e75;
+  --bg:#0f1720;
+  --shadow:0 12px 28px rgba(0,0,0,.18);
+  --max-width:1200px;
+  --min-width:320px;
+}
 
-    :root{
-      --nb-brand: #085e75;
-      --nb-brand-dark: #074b5d;
-      --nb-accent: #0f9d58; /* verde resaltado */
-      --nb-bg: #0f1720;     /* letterbox detrás de las imágenes */
-      --nb-dot: rgba(255,255,255,0.55);
-      --nb-shadow: 0 12px 28px rgba(0,0,0,.18);
-      --nb-header-h: 66px;
-      --nb-header-h-sm: 60px;
-      --nb-spam-bg: #eaf7f5; /* nuevo: spam claro para diferenciar */
-      --nb-spam-text: #053437;
-      --nb-separator: rgba(0,0,0,0.06);
-    }
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#111;background:#fff;}
+a{text-decoration:none;color:inherit;}
 
-    /* Basic resets (scoped only via body, safe) */
-    html,body{height:100%; margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:#111;}
+.slider-container{
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+  position:relative;
+  overflow:hidden;
+}
 
-    /* ===== Contenedor raíz (evita afectar globalmente) ===== */
-    .nb-slider-root { width:100%; }
+.slider-slide{
+  display:none;
+  width:100%;
+  position:relative;
+}
 
-    /* ============ Slider principal (aislado) ============ */
-    .nb-slider { width:100%; background: var(--nb-bg); }
+.slider-slide.active{
+  display:block;
+}
 
-    .nb-hero {
-      width:100%;
-      height: calc(100vh - var(--nb-header-h));
-      min-height:260px;
-      position:relative;
-      overflow:hidden;
-      background: var(--nb-bg);
-      display:block;
-    }
+.slider-slide img{
+  width:100%;
+  height:auto;
+  border-radius:6px;
+  box-shadow:var(--shadow);
+  object-fit:contain;
+}
 
-    /* Slides generales */
-    .nb-slides { position:relative; width:100%; height:100%; }
-    .nb-slide {
-      position:absolute; inset:0;
-      display:grid; place-items:center;
-      opacity:0; pointer-events:none;
-      transition: opacity .45s ease;
-      padding: 12px; /* margen interior para "aire" */
-      box-sizing: border-box;
-    }
-    .nb-slide.is-active{ opacity:1; pointer-events:auto; z-index:1; }
+.slider-dots{
+  position:absolute;
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:8px;
+}
 
-    .nb-slide > a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; text-decoration:none; }
+.slider-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.5);
+  cursor:pointer;
+}
 
-    /* Imagen: comportamiento responsive robusto */
-    .nb-slide picture, .nb-slide img { display:block; width:100%; height:100%; }
+.slider-dot.active{
+  background:#fff;
+  width:18px;
+}
 
-    /* Desktop: imagen ocupa todo el contenedor y se recorta si es necesario (más "cinemática") */
-    .nb-slide img {
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 6px;
-      box-shadow: var(--nb-shadow);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-      max-width: none;
-      max-height: none;
-    }
+.slider-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:40px;
+  height:40px;
+  background:rgba(255,255,255,0.9);
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  font-size:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:var(--shadow);
+}
 
-    /* MOBILE (<=900px): si tus fotos son 1x1 queremos que se VEAN COMPLETAS — usamos contain,
-       centramos y evitamos que la imagen colapse a 0 */
-    @media (max-width:900px) {
-      .nb-hero { height: calc(100vh - var(--nb-header-h-sm)); }
+.slider-btn.prev{left:10px;}
+.slider-btn.next{right:10px;}
 
-      /* asegurar que el contenedor tenga dimensiones consistentes */
-      .nb-slide, .nb-slide > a { width:100%; height:100%; }
+@media(max-width:768px){
+  .slider-btn{display:none;}
+}
 
-      .nb-slide img {
-        display:block;
-        width: 100%;        /* evita que el navegador dé width:0 */
-        height: auto;       /* mantiene ratio natural */
-        max-height: 100%;   /* no exceder la altura del hero */
-        object-fit: contain;/* muestra la imagen completa (no recorta) */
-        object-position: center;
-        margin: 0 auto;
-        border-radius: 6px;
-      }
+.nb-spam{
+  width:100%;
+  background:#eaf7f5;
+  padding:12px 16px;
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  gap:12px;
+  max-width:var(--max-width);
+  margin:20px auto;
+  border-radius:8px;
+  box-shadow:0 6px 22px rgba(0,0,0,0.06);
+}
 
-      .nb-slide { padding: 8px; }
-    }
+.nb-spam a{
+  background:var(--brand);
+  color:#fff;
+  padding:8px 14px;
+  border-radius:6px;
+  font-weight:700;
+}
 
-    @media (max-width:480px){
-      .nb-slide img { max-height: calc(100% - 92px); } /* más aire en móviles si hace falta */
-    }
+footer{
+  background:#042028;
+  color:#eaf7fb;
+  padding:40px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  align-items:center;
+}
 
-    /* Controles (prev/next). Ocultos en pantallas pequeñas */
-    .nb-control {
-      position:absolute; top:50%; transform:translateY(-50%);
-      width:44px; height:44px; border-radius:999px; display:grid; place-items:center;
-      background:rgba(255,255,255,0.95); border:1px solid rgba(0,0,0,.06);
-      cursor:pointer; box-shadow:var(--nb-shadow); font-size:22px; z-index:30;
-    }
-    .nb-control.prev { left:12px; }
-    .nb-control.next { right:12px; }
-    @media (max-width:520px){ .nb-control { display:none; } }
+footer h3{
+  margin:0 0 8px;
+  font-size:1.2rem;
+  color:#fff;
+}
 
-    /* Dots */
-    .nb-dots {
-      position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
-      display:flex; gap:8px; padding:6px 10px; border-radius:999px;
-      background: rgba(0,0,0,0.18); z-index:32; backdrop-filter: blur(6px);
-    }
-    .nb-dot { width:10px; height:10px; border-radius:50%; background:var(--nb-dot); border:0; cursor:pointer; }
-    .nb-dot.is-active{ width:22px; border-radius:999px; background:#fff; transition:width .22s ease; }
+footer .socials{
+  display:flex;
+  gap:16px;
+}
 
-    /* ============ Desktop vs Mobile sets (3 images cada uno) ============ */
-    .nb-slides-desktop { display:block; height:100%; }
-    .nb-slides-mobile { display:none; height:100%; }
+footer .socials a{
+  color:#eaf7fb;
+  font-weight:bold;
+}
 
-    @media (max-width:900px){
-      .nb-slides-desktop { display:none !important; }
-      .nb-slides-mobile { display:block !important; }
-    }
+footer .contact{
+  text-align:center;
+  font-size:0.9rem;
+  line-height:1.5;
+}
 
-    /* Nota en verde para indicar sección móvil (según pediste) */
-    .nb-device-note { text-align:center; color:var(--nb-accent); font-weight:700; margin:8px 0 6px 0; }
-
-
-    /* ===== Promo / spam: ahora claramente separado del footer =====
-       - fondo más claro para contrastar con footer oscuro
-       - spacing y borde inferior para separación
-    */
-    .nb-spam--full {
-      width:100%;
-      background: var(--nb-spam-bg);
-      box-shadow: 0 6px 22px rgba(0,0,0,0.06);
-      border-top: 1px solid rgba(10,80,75,0.04);
-      margin-bottom:18px; /* espacio que separa del footer */
-      padding:10px 0; /* espacio vertical para que respire */
-    }
-    .nb-spam {
-      max-width:1200px;
-      margin:0 auto;
-      padding:14px 20px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      color:var(--nb-spam-text);
-      border-radius:10px;
-      transform:translateY(0);
-    }
-    .nb-spam .nb-spam-text { font-weight:800; font-size:1.05rem; letter-spacing:0.2px; color:var(--nb-spam-text); }
-    .nb-spam .nb-spam-cta { display:flex; gap:10px; align-items:center; }
-    .nb-spam .nb-btn {
-      background: var(--nb-brand); color:#fff; padding:8px 14px; border-radius:999px; font-weight:800; text-decoration:none;
-      box-shadow: 0 8px 22px rgba(10,60,65,0.10);
-      border: 0;
-    }
-    .nb-spam .nb-btn.secondary {
-      background:transparent; border:1px solid rgba(5,52,47,0.08); color:var(--nb-brand-dark); padding:8px 12px; border-radius:8px; font-weight:700;
-    }
-    @media (max-width:720px){
-      .nb-spam { flex-direction:column; text-align:center; padding:12px; border-radius:8px; }
-      .nb-spam .nb-spam-text { font-size:1rem; }
-    }
-
-    /* pequeño separador visual (entre spam y footer) */
-    .nb-spam-separator {
-      height:8px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.06));
-      width:100%;
-    }
-
-    /* ============ Footer mejorado ============ */
-    .nb-footer {
-      background: linear-gradient(180deg, #042028 0%, #061f24 100%);
-      color: #eaf7fb;
-      padding:36px 18px;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.45);
-      border-top: 1px solid rgba(255,255,255,0.02);
-    }
-
-    .nb-footer-inner {
-      max-width:1200px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 1fr 1fr 300px;
-      gap:18px;
-      align-items:start;
-    }
-
-    .nb-footer .nb-brand { display:flex; gap:12px; align-items:center; font-weight:900; font-size:1.05rem; }
-    .nb-footer .nb-brand svg { width:38px; height:38px; }
-
-    .nb-footer .nb-contact { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
-    .nb-footer a { color: #eaf7fb; text-decoration:none; display:flex; gap:8px; align-items:center; font-weight:700; opacity:0.95; }
-    .nb-footer a:hover { opacity:1; transform:translateY(-2px); }
-
-    .nb-footer .nb-address { font-weight:700; opacity:0.95; }
-
-    .nb-social { display:flex; gap:12px; align-items:center; justify-content:flex-end; }
-    .nb-social a { min-width:88px; padding:8px 10px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.02); font-weight:800; }
-    .nb-social a:hover { background: rgba(234,247,251,0.06); transform:translateY(-2px); }
-
-    .nb-footer .nb-copy { text-align:right; font-size:0.9rem; opacity:0.85; }
-
-    @media (max-width:900px){
-      .nb-footer-inner { grid-template-columns: 1fr; text-align:center; }
-      .nb-footer .nb-copy { text-align:center; margin-top:8px; }
-      .nb-footer .nb-brand { justify-content:center; }
-      .nb-footer .nb-contact { justify-content:center; }
-      .nb-social { justify-content:center; }
-      .nb-footer .nb-copy { order: 3; }
-    }
-
-    /* accessibility focus for anchor */
-    .nb-slide a:focus, .nb-footer a:focus, .nb-spam .nb-btn:focus { outline: 3px solid rgba(15,93,117,0.95); outline-offset: 3px; border-radius:6px; }
-
-  </style>
+</style>
 </head>
 <body>
-  <!-- ======= TU HEADER (NO MODIFICAR) ======= -->
   <div id="header-placeholder"></div>
-  <script src="scripts/load-header.js"></script>
+  <script src="../scripts/load-header.js"></script>
 
-  <!-- ============ AQUI EMPIEZA nuestro slider aislado ============ -->
-  <div class="nb-slider-root">
-    <section class="nb-slider" aria-label="Slider principal">
-      <div class="nb-hero" role="region" aria-label="Hero principal">
+<!-- Slider -->
+<div class="slider-container">
+  <div class="slider-slide active"><img src="./fotos/Banner1.jpeg" alt="Banner 1"></div>
+  <div class="slider-slide"><img src="./fotos/Banner2.jpeg" alt="Banner 2"></div>
+  <div class="slider-slide"><img src="./fotos/Banner3.jpeg" alt="Banner 3"></div>
 
-        <!-- ===== Desktop: imágenes ===== -->
-        <div class="nb-slides nb-slides-desktop" data-nb-slides="desktop">
+  <button class="slider-btn prev">‹</button>
+  <button class="slider-btn next">›</button>
 
-          <figure class="nb-slide" aria-hidden="true">
-            <a href="./pages/industria.html" aria-label="Ir a Industria">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner2-mobile.jpeg">
-                <img src="./fotos/Banner2.jpeg" alt="Banner 2 desktop" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <figure class="nb-slide" aria-hidden="true">
-            <a href="./pages/novedades.html" aria-label="Ir a Novedades">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
-                <img src="./fotos/Banner3.jpeg" alt="Banner 3 desktop" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <figure class="nb-slide" aria-hidden="true">
-            <a href="./pages/novedades.html" aria-label="Ir a Novedades">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
-                <img src="./fotos/Banner1.jpeg" alt="Imagen extra desktop" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <button class="nb-control prev" aria-label="Anterior" data-nb-prev="desktop">‹</button>
-          <button class="nb-control next" aria-label="Siguiente" data-nb-next="desktop">›</button>
-          <div class="nb-dots" data-nb-dots="desktop" role="tablist" aria-label="Paginación desktop"></div>
-        </div>
-
-        <!-- ===== Mobile: imágenes para celular (1x1) ===== -->
-        <div class="nb-slides nb-slides-mobile" data-nb-slides="mobile">
-          <figure class="nb-slide is-active">
-            <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia (móvil)">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner1-mobile.jpeg">
-                <img src="./fotos/celular1.jpeg" alt="1 móvil" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <figure class="nb-slide" aria-hidden="true">
-            <a href="./pages/industria.html" aria-label="Ir a Industria (móvil)">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner2-mobile.jpeg">
-                <img src="./fotos/Banner2.jpeg" alt="Banner 2 móvil" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <figure class="nb-slide" aria-hidden="true">
-            <a href="./pages/novedades.html" aria-label="Ir a Novedades (móvil)">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
-                <img src="./fotos/celular3.jpeg" alt="Banner 3 móvil" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <figure class="nb-slide" aria-hidden="true">
-            <a href="./pages/novedades.html" aria-label="Ir a Novedades (móvil)">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
-                <img src="./fotos/celular4.jpeg" alt="Banner 4 móvil" loading="lazy" />
-              </picture>
-            </a>
-          </figure>
-
-          <button class="nb-control prev" aria-label="Anterior" data-nb-prev="mobile">‹</button>
-          <button class="nb-control next" aria-label="Siguiente" data-nb-next="mobile">›</button>
-          <div class="nb-dots" data-nb-dots="mobile" role="tablist" aria-label="Paginación móvil"></div>
-        </div>
-      </div>
-
-      <!-- ===== Promo / "spam" full-width ===== -->
-      <div class="nb-spam--full" aria-hidden="false">
-        <div class="nb-spam" role="region" aria-label="Novedad destacada">
-          <div class="nb-spam-text">Paritarias2025 — Actualizaciones y novedades del sector del gas.</div>
-          <div class="nb-spam-cta">
-            <a class="nb-btn" href="./pages/novedades.html" aria-label="Ver más sobre Paritarias2025">Ver más</a>
-            <a class="nb-btn secondary" href="./pages/novedades.html#detalle" aria-label="Detalle">Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- separador visual entre spam y footer -->
-      <div class="nb-spam-separator" aria-hidden="true"></div>
-
-    </section>
-
-    <!-- ============ Footer mejorado ============ -->
-    <footer class="nb-footer" role="contentinfo" aria-label="Pie de página">
-      <div class="nb-footer-inner">
-
-        <div class="nb-brand">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" role="img">
-            <rect width="24" height="24" rx="5" fill="#eaf7fb"/>
-            <path d="M6 12h12M6 8h12M6 16h12" stroke="#085e75" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-          <div>
-            Sindicato del Gas<br><small style="opacity:.85; font-weight:700;">Organización y Trabajo</small>
-          </div>
-        </div>
-
-        <div>
-          <div class="nb-contact">
-            <div class="nb-address">BOEDO 90 — CAPITAL FEDERAL</div>
-          </div>
-          <div style="margin-top:8px; opacity:0.95;">
-            <a href="mailto:stigasredes@gmail.com" aria-label="Enviar mail">stigasredes@gmail.com</a>
-          </div>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
-          <div class="nb-social" aria-label="Redes sociales">
-            <a href="https://instagram.com/STIGAS_BA" target="_blank" rel="noopener" aria-label="Instagram">@STIGAS_BA</a>
-            <a href="https://x.com/STIGAS_BA" target="_blank" rel="noopener" aria-label="X (Twitter)">@STIGAS_BA</a>
-          </div>
-          <div class="nb-copy">&copy; <span id="nb-year"></span> Sindicato del Gas — Todos los derechos reservados</div>
-        </div>
-
-      </div>
-    </footer>
+  <div class="slider-dots">
+    <div class="slider-dot active" data-index="0"></div>
+    <div class="slider-dot" data-index="1"></div>
+    <div class="slider-dot" data-index="2"></div>
   </div>
+</div>
 
-  <!-- ============ JS: slider init (aislado) ============ -->
-  <script>
-    (function () {
-      // Inicializa un slider aislado en el container pasado.
-      function initNbSlider(container, opts = {}) {
-        const root = container;
-        const slides = Array.from(root.querySelectorAll('.nb-slide'));
-        const prev = root.querySelector('[data-nb-prev="' + (opts.key || '') + '"]') || root.querySelector('[data-nb-prev]');
-        const next = root.querySelector('[data-nb-next="' + (opts.key || '') + '"]') || root.querySelector('[data-nb-next]');
-        const dotsContainer = root.querySelector('[data-nb-dots="' + (opts.key || '') + '"]') || root.querySelector('.nb-dots');
+<!-- Spam -->
+<div class="nb-spam">
+  <div>Paritarias2025 — Actualizaciones y novedades del sector del gas.</div>
+  <a href="./pages/novedades.html">Ver más</a>
+</div>
 
-        // Build dots
-        slides.forEach((_, i) => {
-          const b = document.createElement('button');
-          b.className = 'nb-dot' + (i === 0 ? ' is-active' : '');
-          b.type = 'button';
-          b.setAttribute('aria-label', 'Ir a imagen ' + (i + 1));
-          b.addEventListener('click', () => go(i, true));
-          dotsContainer.appendChild(b);
-        });
-        const dots = Array.from(dotsContainer.children);
+<!-- Footer -->
+<footer>
+  <h3>Redes Sociales</h3>
+  <div class="socials">
+    <a href="https://www.instagram.com/STIGAS_BA" target="_blank">Instagram: STIGAS_BA</a>
+    <a href="https://twitter.com/STIGAS_BA" target="_blank">Twitter/X: STIGAS_BA</a>
+  </div>
+  <div class="contact">
+    Teléfono: 4958-0700<br>
+    Dirección: Boedo 90 - Capital Federal<br>
+    Mail: <a href="mailto:stigasredes@gmail.com">stigasredes@gmail.com</a><br>
+    © <span id="year"></span> Sindicato del Gas — Todos los derechos reservados
+  </div>
+</footer>
 
-        let idx = 0;
-        const AUTOPLAY = opts.autoplay || 5000;
-        let timer = null;
-        let isHover = false;
+<script>
+const slides = document.querySelectorAll('.slider-slide');
+const dots = document.querySelectorAll('.slider-dot');
+let current = 0;
 
-        function show(n) {
-          slides.forEach((s, i) => {
-            const active = i === n;
-            s.classList.toggle('is-active', active);
-            s.setAttribute('aria-hidden', !active);
-            if (dots[i]) dots[i].classList.toggle('is-active', active);
-          });
-        }
-        function go(n, user=false) {
-          idx = (n + slides.length) % slides.length;
-          show(idx);
-          if (user) restart();
-        }
-        function nextFn(){ go(idx + 1); }
-        function prevFn(){ go(idx - 1); }
+function showSlide(index){
+  slides.forEach((s,i)=>s.classList.toggle('active', i===index));
+  dots.forEach((d,i)=>d.classList.toggle('active', i===index));
+  current=index;
+}
 
-        prev && prev.addEventListener('click', prevFn);
-        next && next.addEventListener('click', nextFn);
+document.querySelector('.slider-btn.next').addEventListener('click', ()=>showSlide((current+1)%slides.length));
+document.querySelector('.slider-btn.prev').addEventListener('click', ()=>showSlide((current-1+slides.length)%slides.length));
+dots.forEach(d=>d.addEventListener('click', ()=>showSlide(parseInt(d.dataset.index))));
 
-        function start(){ stop(); timer = setInterval(() => { if(!isHover) nextFn(); }, AUTOPLAY); }
-        function stop(){ if (timer) { clearInterval(timer); timer = null; } }
-        function restart(){ start(); }
+// Autoplay
+setInterval(()=>showSlide((current+1)%slides.length), 5000);
 
-        // Pause on hover/touch
-        root.addEventListener('mouseenter', () => { isHover = true; });
-        root.addEventListener('mouseleave', () => { isHover = false; });
-        root.addEventListener('touchstart', () => { isHover = true; }, {passive:true});
-        root.addEventListener('touchend', () => { isHover = false; }, {passive:true});
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 
-        // swipe support
-        (function addSwipe(){
-          let startX = 0, endX = 0;
-          root.addEventListener('touchstart', (e) => { startX = e.changedTouches[0].clientX; }, {passive:true});
-          root.addEventListener('touchmove', (e) => { endX = e.changedTouches[0].clientX; }, {passive:true});
-          root.addEventListener('touchend', () => {
-            const diff = endX - startX;
-            if (Math.abs(diff) > 40) {
-              if (diff < 0) nextFn(); else prevFn();
-            }
-            startX = endX = 0;
-          }, {passive:true});
-        })();
-
-        // keyboard navigation only when visible
-        document.addEventListener('keydown', (e) => {
-          const style = window.getComputedStyle(root);
-          if (style.display === 'none') return;
-          if (e.key === 'ArrowRight') nextFn();
-          if (e.key === 'ArrowLeft') prevFn();
-        });
-
-        show(0);
-        start();
-
-        return { go, start, stop };
-      }
-
-      // Init desktop slider (if present)
-      const desktopContainer = document.querySelector('.nb-slides-desktop');
-      if (desktopContainer) initNbSlider(desktopContainer, { key: 'desktop', autoplay: 5000 });
-
-      // Init mobile slider (if present)
-      const mobileContainer = document.querySelector('.nb-slides-mobile');
-      if (mobileContainer) initNbSlider(mobileContainer, { key: 'mobile', autoplay: 4500 });
-
-      // año dinámico en el footer
-      document.getElementById('nb-year').textContent = new Date().getFullYear();
-
-    })();
-  </script>
 </body>
 </html>
