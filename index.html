@@ -62,9 +62,9 @@
 
     /* Imagen: se muestra completa, sin distorsión, centrada */
     .nb-slide picture,
-    .nb-slide img { display:block; width: 100%; height: 100%; }
+    .nb-slide img { display:block; width: 95%; height: 105%; }
     .nb-slide img {
-      object-fit: contain;
+      object-fit:contain;
       object-position: center;
       max-width: 100%;
       max-height: calc(100% - 72px); /* espacio inferior para evitar cortes */
@@ -215,14 +215,14 @@
 
         <!-- ===== Desktop: 3 imágenes (reemplazá las rutas si querés versiones para móvil) ===== -->
         <div class="nb-slides nb-slides-desktop" data-nb-slides="desktop">
-          <figure class="nb-slide is-active">
+          <!-- <figure class="nb-slide is-active">
             <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia">
               <picture>
                 <source media="(max-width:900px)" srcset="./fotos/Banner1-mobile.jpeg">
                 <img src="./fotos/Banner1.jpeg" alt="Banner 1 desktop" loading="lazy" />
               </picture>
             </a>
-          </figure>
+          </figure> -->
 
           <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/industria.html" aria-label="Ir a Industria">
