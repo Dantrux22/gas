@@ -55,26 +55,52 @@
       opacity:0; pointer-events:none;
       transition: opacity .45s ease;
       padding: 12px; /* margen interior para "aire" */
+      box-sizing: border-box;
     }
     .nb-slide.is-active{ opacity:1; pointer-events:auto; z-index:1; }
 
     .nb-slide > a { display:flex; align-items:center; justify-content:center; width:100%; height:100%; text-decoration:none; }
 
-    /* Imagen: se muestra completa, sin distorsión, centrada */
-    .nb-slide picture,
-    .nb-slide img { display:block; width: 95%; height: 105%; }
+    /* Imagen: comportamiento responsive robusto */
+    .nb-slide picture, .nb-slide img { display:block; width:100%; height:100%; }
+
+    /* Desktop: imagen ocupa todo el contenedor y se recorta si es necesario (más "cinemática") */
     .nb-slide img {
-      object-fit:contain;
+      width:100%;
+      height:100%;
+      object-fit: cover;
       object-position: center;
-      max-width: 100%;
-      max-height: calc(100% - 72px); /* espacio inferior para evitar cortes */
       border-radius: 6px;
       box-shadow: var(--nb-shadow);
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      max-width: none;
+      max-height: none;
     }
-    @media (max-width:480px){
+
+    /* MOBILE (<=900px): si tus fotos son 1x1 queremos que se VEAN COMPLETAS — usamos contain,
+       centramos y evitamos que la imagen colapse a 0 */
+    @media (max-width:900px) {
       .nb-hero { height: calc(100vh - var(--nb-header-h-sm)); }
-      .nb-slide img { max-height: calc(100% - 92px); } /* más aire en móviles */
+
+      /* asegurar que el contenedor tenga dimensiones consistentes */
+      .nb-slide, .nb-slide > a { width:100%; height:100%; }
+
+      .nb-slide img {
+        display:block;
+        width: 100%;        /* evita que el navegador dé width:0 */
+        height: auto;       /* mantiene ratio natural */
+        max-height: 100%;   /* no exceder la altura del hero */
+        object-fit: contain;/* muestra la imagen completa (no recorta) */
+        object-position: center;
+        margin: 0 auto;
+        border-radius: 6px;
+      }
+
+      .nb-slide { padding: 8px; }
+    }
+
+    @media (max-width:480px){
+      .nb-slide img { max-height: calc(100% - 92px); } /* más aire en móviles si hace falta */
     }
 
     /* Controles (prev/next). Ocultos en pantallas pequeñas */
@@ -213,16 +239,8 @@
     <section class="nb-slider" aria-label="Slider principal">
       <div class="nb-hero" role="region" aria-label="Hero principal">
 
-        <!-- ===== Desktop: 3 imágenes (reemplazá las rutas si querés versiones para móvil) ===== -->
+        <!-- ===== Desktop: imágenes ===== -->
         <div class="nb-slides nb-slides-desktop" data-nb-slides="desktop">
-          <!-- <figure class="nb-slide is-active">
-            <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia">
-              <picture>
-                <source media="(max-width:900px)" srcset="./fotos/Banner1-mobile.jpeg">
-                <img src="./fotos/Banner1.jpeg" alt="Banner 1 desktop" loading="lazy" />
-              </picture>
-            </a>
-          </figure> -->
 
           <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/industria.html" aria-label="Ir a Industria">
@@ -241,11 +259,12 @@
               </picture>
             </a>
           </figure>
-                    <figure class="nb-slide" aria-hidden="true">
+
+          <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/novedades.html" aria-label="Ir a Novedades">
               <picture>
                 <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
-                <img src="./fotos/celular1.jpeg" alt="Banner 3 desktop" loading="lazy" />
+                <img src="./fotos/Banner1.jpeg" alt="Imagen extra desktop" loading="lazy" />
               </picture>
             </a>
           </figure>
@@ -255,16 +274,13 @@
           <div class="nb-dots" data-nb-dots="desktop" role="tablist" aria-label="Paginación desktop"></div>
         </div>
 
-        <!-- Nota verde indicando la sección móvil -->
-        <!-- <div class="nb-device-note" aria-hidden="true">IMÁGENES PARA CELULAR</div> -->
-
-        <!-- ===== Mobile: 3 imágenes (pueden apuntar a mismas rutas o a versiones mobile) ===== -->
+        <!-- ===== Mobile: imágenes para celular (1x1) ===== -->
         <div class="nb-slides nb-slides-mobile" data-nb-slides="mobile">
           <figure class="nb-slide is-active">
             <a href="./pages/historia.html" aria-label="Ir a Institucional — Historia (móvil)">
               <picture>
                 <source media="(max-width:900px)" srcset="./fotos/Banner1-mobile.jpeg">
-                <img src="./fotos/celular2.jpeg" alt="Banner 1 móvil" loading="lazy" />
+                <img src="./fotos/celular1.jpeg" alt="1 móvil" loading="lazy" />
               </picture>
             </a>
           </figure>
@@ -286,11 +302,12 @@
               </picture>
             </a>
           </figure>
-                    <figure class="nb-slide" aria-hidden="true">
+
+          <figure class="nb-slide" aria-hidden="true">
             <a href="./pages/novedades.html" aria-label="Ir a Novedades (móvil)">
               <picture>
                 <source media="(max-width:900px)" srcset="./fotos/Banner3-mobile.jpeg">
-                <img src="./fotos/celular4.jpeg" alt="Banner 3 móvil" loading="lazy" />
+                <img src="./fotos/celular4.jpeg" alt="Banner 4 móvil" loading="lazy" />
               </picture>
             </a>
           </figure>
