@@ -8,24 +8,52 @@
 
 <style>
 :root{
-  --brand:#085e75;
-  --bg:#0f1720;
-  --shadow:0 12px 28px rgba(0,0,0,.18);
+  --brand:#07a3b0;       /* botón / acento */
+  --bg:#07121a;          /* fondo principal más oscuro */
+  --panel:#0b2a33;       /* fondo de paneles */
+  --muted:#9fc7cc;
+  --shadow:0 12px 28px rgba(0,0,0,.45);
   --max-width:1200px;
   --min-width:320px;
+  --radius:8px;
 }
 
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#111;background:#fff;}
-a{text-decoration:none;color:inherit;}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--muted);
+  background:linear-gradient(180deg,var(--bg) 0%, #041018 100%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
 
+/* Links */
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit}
+
+/* Container centrado */
+.container{
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+  padding:20px 16px;
+}
+
+/* Slider */
 .slider-container{
   width:100%;
   max-width:var(--max-width);
   margin:0 auto;
   position:relative;
   overflow:hidden;
+  border-radius:var(--radius);
+  background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.35));
+  padding:12px;
+  box-shadow:var(--shadow);
 }
 
+/* Cada slide */
 .slider-slide{
   display:none;
   width:100%;
@@ -36,85 +64,161 @@ a{text-decoration:none;color:inherit;}
   display:block;
 }
 
+/* Imagen: mantener toda la imagen visible (no recorta) */
 .slider-slide img{
   width:100%;
   height:auto;
   border-radius:6px;
-  box-shadow:var(--shadow);
-  object-fit:contain;
+  box-shadow:0 6px 18px rgba(0,0,0,.45);
+  object-fit:contain; /* mantiene la imagen completa */
+  background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.04));
 }
 
+/* Dots */
 .slider-dots{
   position:absolute;
-  bottom:12px;
+  bottom:18px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
   gap:8px;
+  z-index:30;
 }
 
 .slider-dot{
   width:10px;
   height:10px;
   border-radius:50%;
-  background:rgba(255,255,255,0.5);
+  background:rgba(255,255,255,0.25);
   cursor:pointer;
+  transition:all .22s ease;
+  border:1px solid rgba(255,255,255,0.06);
 }
 
 .slider-dot.active{
-  background:#fff;
+  background:var(--brand);
   width:18px;
+  border-radius:999px;
+  box-shadow:0 4px 14px rgba(7,163,176,0.18);
 }
 
+/* Buttons */
 .slider-btn{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  width:40px;
-  height:40px;
-  background:rgba(255,255,255,0.9);
+  width:44px;
+  height:44px;
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
   border:none;
   border-radius:50%;
   cursor:pointer;
-  font-size:24px;
+  font-size:26px;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:var(--shadow);
+  box-shadow:0 6px 16px rgba(2,8,12,0.6);
+  backdrop-filter: blur(4px);
+  z-index:30;
 }
 
-.slider-btn.prev{left:10px;}
-.slider-btn.next{right:10px;}
+.slider-btn:hover{transform:translateY(-50%) scale(1.02); background:rgba(255,255,255,0.08);}
+
+.slider-btn.prev{left:8px;}
+.slider-btn.next{right:8px;}
 
 @media(max-width:768px){
   .slider-btn{display:none;}
 }
 
+/* "Spam" strip con dropdown integrado */
 .nb-spam{
   width:100%;
-  background:#eaf7f5;
+  background:linear-gradient(90deg, rgba(10,50,55,0.9), rgba(8,36,40,0.9));
   padding:12px 16px;
   display:flex;
-  justify-content:flex-start;
+  justify-content:space-between;
   align-items:center;
   gap:12px;
   max-width:var(--max-width);
   margin:20px auto;
-  border-radius:8px;
-  box-shadow:0 6px 22px rgba(0,0,0,0.06);
+  border-radius:10px;
+  box-shadow:0 8px 28px rgba(2,8,12,0.6);
+  color:#e7fbfd;
+  position:relative;
 }
 
-.nb-spam a{
+/* Texto izquierdo */
+.nb-spam .text{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:0.95rem;
+}
+
+.nb-spam .text b{color:#fff; font-weight:700;}
+
+/* Botón que abre el dropdown (estilizado como link) */
+.nb-spam .actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.nb-spam .btn-link{
   background:var(--brand);
-  color:#fff;
+  color:#04292c;
   padding:8px 14px;
-  border-radius:6px;
+  border-radius:8px;
   font-weight:700;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(7,163,176,0.14);
 }
 
+/* Dropdown - inicialmente oculto */
+.nb-dropdown{
+  position:absolute;
+  right:16px;
+  top:100%;
+  margin-top:10px;
+  background:linear-gradient(180deg, var(--panel), rgba(11,42,51,0.98));
+  border-radius:10px;
+  box-shadow:0 18px 40px rgba(2,8,12,0.6);
+  min-width:220px;
+  overflow:hidden;
+  transform-origin:top right;
+  z-index:100;
+  border:1px solid rgba(255,255,255,0.03);
+  display:none;
+}
+
+/* Mostrar con clase .open */
+.nb-dropdown.open{display:block; animation:drop .16s ease;}
+
+@keyframes drop{
+  from{opacity:0; transform:translateY(-6px) scale(.98)}
+  to{opacity:1; transform:translateY(0) scale(1)}
+}
+
+.nb-dropdown a{
+  display:block;
+  padding:12px 14px;
+  color:var(--muted);
+  font-weight:600;
+  border-bottom:1px solid rgba(255,255,255,0.02);
+}
+
+.nb-dropdown a:hover{
+  background:rgba(255,255,255,0.02);
+  color:#fff;
+}
+
+/* Footer */
 footer{
-  background:#042028;
-  color:#eaf7fb;
+  background:#03171b;
+  color:#cfeff1;
   padding:40px 16px;
   display:flex;
   flex-direction:column;
@@ -131,19 +235,31 @@ footer h3{
 footer .socials{
   display:flex;
   gap:16px;
+  flex-wrap:wrap;
+  justify-content:center;
 }
 
 footer .socials a{
-  color:#eaf7fb;
-  font-weight:bold;
+  color:#9fe7ea;
+  font-weight:700;
+  background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding:8px 12px;
+  border-radius:8px;
 }
 
 footer .contact{
   text-align:center;
-  font-size:0.9rem;
-  line-height:1.5;
+  font-size:0.95rem;
+  line-height:1.45;
+  color:var(--muted);
 }
 
+/* Responsive tweaks */
+@media(max-width:600px){
+  .nb-spam{flex-direction:column; align-items:flex-start; gap:10px; padding:12px;}
+  .nb-spam .actions{align-self:stretch; width:100%; justify-content:space-between;}
+  .nb-dropdown{right:12px; left:12px; min-width:auto;}
+}
 </style>
 </head>
 <body>
@@ -151,33 +267,51 @@ footer .contact{
   <script src="../scripts/load-header.js"></script>
 
 <!-- Slider -->
-<div class="slider-container">
-  <div class="slider-slide active"><img src="./fotos/Banner1.jpeg" alt="Banner 1"></div>
-  <div class="slider-slide"><img src="./fotos/Banner2.jpeg" alt="Banner 2"></div>
-  <div class="slider-slide"><img src="./fotos/Banner3.jpeg" alt="Banner 3"></div>
+<div class="slider-container container" aria-label="Carrusel de banners">
+  <div class="slider-slide active"><img src="./fotos/Banner1.jpeg" alt="Banner 1 — Sindicato del Gas"></div>
+  <div class="slider-slide"><img src="./fotos/Banner2.jpeg" alt="Banner 2 — Actividades"></div>
+  <div class="slider-slide"><img src="./fotos/celular2.jpeg" alt="Banner 3 — Novedades"></div>
 
-  <button class="slider-btn prev">‹</button>
-  <button class="slider-btn next">›</button>
+  <button class="slider-btn prev" aria-label="Anterior">‹</button>
+  <button class="slider-btn next" aria-label="Siguiente">›</button>
 
-  <div class="slider-dots">
-    <div class="slider-dot active" data-index="0"></div>
-    <div class="slider-dot" data-index="1"></div>
-    <div class="slider-dot" data-index="2"></div>
+  <div class="slider-dots" role="tablist" aria-label="Paginación del carrusel">
+    <div class="slider-dot active" data-index="0" role="tab" aria-selected="true" aria-controls="slide-0"></div>
+    <div class="slider-dot" data-index="1" role="tab" aria-selected="false" aria-controls="slide-1"></div>
+    <div class="slider-dot" data-index="2" role="tab" aria-selected="false" aria-controls="slide-2"></div>
   </div>
 </div>
 
-<!-- Spam -->
-<div class="nb-spam">
-  <div>Paritarias2025 — Actualizaciones y novedades del sector del gas.</div>
-  <a href="./pages/novedades.html">Ver más</a>
+<!-- Spam con dropdown -->
+<div class="nb-spam container" aria-live="polite">
+  <div class="text">
+    <div><b>Paritarias2025</b> — Actualizaciones y novedades del sector del gas.</div>
+    <div style="font-size:0.85rem;color:rgba(255,255,255,0.55)">Última actualización: consulta novedades y documentos</div>
+  </div>
+
+  <div class="actions" aria-haspopup="true" aria-expanded="false">
+    <!-- Botón que abre dropdown -->
+    <button id="verMasBtn" class="btn-link" aria-controls="nbDropdown" aria-expanded="false">Ver más ▾</button>
+  </div>
+
+  <!-- Dropdown (simula el menu del header dentro de esta sección) -->
+  <nav id="nbDropdown" class="nb-dropdown" role="menu" aria-label="Menú Paritarias">
+    <a href="./pages/novedades.html" role="menuitem">Novedades</a>
+    <a href="./pages/calendario.html" role="menuitem">Calendario de reuniones</a>
+    <a href="./pages/convenios.html" role="menuitem">Convenios y acuerdos</a>
+    <a href="./pages/legislacion.html" role="menuitem">Legislación</a>
+    <a href="./pages/documentos.html" role="menuitem">Documentos y actas</a>
+    <a href="./pages/contacto.html" role="menuitem">Contacto</a>
+    <a href="./pages/historia.html" role="menuitem">Historia y archivo</a>
+  </nav>
 </div>
 
 <!-- Footer -->
 <footer>
   <h3>Redes Sociales</h3>
   <div class="socials">
-    <a href="https://www.instagram.com/STIGAS_BA" target="_blank">Instagram: STIGAS_BA</a>
-    <a href="https://twitter.com/STIGAS_BA" target="_blank">Twitter/X: STIGAS_BA</a>
+    <a href="https://www.instagram.com/STIGAS_BA" target="_blank" rel="noopener">Instagram: STIGAS_BA</a>
+    <a href="https://twitter.com/STIGAS_BA" target="_blank" rel="noopener">Twitter/X: STIGAS_BA</a>
   </div>
   <div class="contact">
     Teléfono: 4958-0700<br>
@@ -188,23 +322,91 @@ footer .contact{
 </footer>
 
 <script>
+/* Slider JS (igual que antes, con pequeñas mejoras de accesibilidad) */
 const slides = document.querySelectorAll('.slider-slide');
 const dots = document.querySelectorAll('.slider-dot');
 let current = 0;
+let autoplay = true;
+let autoplayInterval = 5000;
+let autoplayTimer = null;
 
 function showSlide(index){
-  slides.forEach((s,i)=>s.classList.toggle('active', i===index));
-  dots.forEach((d,i)=>d.classList.toggle('active', i===index));
-  current=index;
+  index = (index + slides.length) % slides.length;
+  slides.forEach((s,i)=>{
+    s.classList.toggle('active', i===index);
+    // aria-hidden en slides (mejora accesibilidad)
+    s.setAttribute('aria-hidden', i===index ? 'false' : 'true');
+  });
+  dots.forEach((d,i)=>{
+    d.classList.toggle('active', i===index);
+    d.setAttribute('aria-selected', i===index ? 'true' : 'false');
+  });
+  current = index;
 }
 
-document.querySelector('.slider-btn.next').addEventListener('click', ()=>showSlide((current+1)%slides.length));
-document.querySelector('.slider-btn.prev').addEventListener('click', ()=>showSlide((current-1+slides.length)%slides.length));
-dots.forEach(d=>d.addEventListener('click', ()=>showSlide(parseInt(d.dataset.index))));
+document.querySelector('.slider-btn.next').addEventListener('click', ()=>{
+  showSlide((current+1)%slides.length);
+  resetAutoplay();
+});
+document.querySelector('.slider-btn.prev').addEventListener('click', ()=>{
+  showSlide((current-1+slides.length)%slides.length);
+  resetAutoplay();
+});
+dots.forEach(d=>d.addEventListener('click', (e)=>{
+  const idx = parseInt(e.currentTarget.dataset.index);
+  showSlide(idx);
+  resetAutoplay();
+}));
 
-// Autoplay
-setInterval(()=>showSlide((current+1)%slides.length), 5000);
+function startAutoplay(){
+  if(autoplayTimer) clearInterval(autoplayTimer);
+  if(!autoplay) return;
+  autoplayTimer = setInterval(()=>showSlide((current+1)%slides.length), autoplayInterval);
+}
+function resetAutoplay(){
+  if(autoplay){
+    clearInterval(autoplayTimer);
+    startAutoplay();
+  }
+}
+startAutoplay();
 
+/* Dropdown en "Ver más" dentro de nb-spam */
+const verMasBtn = document.getElementById('verMasBtn');
+const nbDropdown = document.getElementById('nbDropdown');
+
+function toggleDropdown(open){
+  const isOpen = nbDropdown.classList.contains('open');
+  const shouldOpen = typeof open === 'boolean' ? open : !isOpen;
+  nbDropdown.classList.toggle('open', shouldOpen);
+  verMasBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+  verMasBtn.parentElement.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+}
+
+// Abrir/cerrar al click
+verMasBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  toggleDropdown();
+});
+
+// Cerrar al click fuera
+document.addEventListener('click', (e)=>{
+  if(!nbDropdown.contains(e.target) && e.target !== verMasBtn){
+    toggleDropdown(false);
+  }
+});
+
+// Cerrar con Escape
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    toggleDropdown(false);
+  }
+});
+
+// Ajuste: si haces resize en móvil, cerrar dropdown
+window.addEventListener('resize', ()=> toggleDropdown(false));
+
+// año dinámico en footer
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 
